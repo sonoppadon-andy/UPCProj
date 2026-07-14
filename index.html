@@ -174,12 +174,12 @@
   input[type=text], input[type=number], input[type=date], select{
     width:100%; background:var(--surface-2); border:1px solid var(--line);
     color:var(--chalk); padding:11px 12px; border-radius:8px; font-size:15px;
-    font-family:var(--font-body);
+    font-family:var(--font-body);min-height:70px;
   }
   input:focus, select:focus{outline:2px solid var(--coral); outline-offset:1px;}
   .distance-input-wrap{position:relative;}
   .distance-input-wrap span{
-    position:absolute; right:12px; top:50%; transform:translateY(-50%);min-height:70px;
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
     color:var(--muted); font-size:13px; font-family:var(--font-mono);
   }
   .photo-drop{
@@ -307,7 +307,7 @@
         </div>
         <div class="field">
           <label for="log-password">รหัสผ่านของฉัน</label>
-          <input type="password" id="log-password" style="width:35%;"placeholder="กรอกรหัสผ่านที่ Admin ตั้งให้">
+          <input type="password" id="log-password" style="width:30%;"placeholder="กรอกรหัสผ่านที่ Admin ตั้งให้">
         </div>
         <button class="primary" id="log-submit">บันทึก</button>
       </div>
