@@ -179,7 +179,7 @@
   input:focus, select:focus{outline:2px solid var(--coral); outline-offset:1px;}
   .distance-input-wrap{position:relative;}
   .distance-input-wrap span{
-    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);min-height:70px;
     color:var(--muted); font-size:13px; font-family:var(--font-mono);
   }
   .photo-drop{
@@ -307,7 +307,7 @@
         </div>
         <div class="field">
           <label for="log-password">รหัสผ่านของฉัน</label>
-          <input type="password" id="log-password" style="width:20%;"placeholder="กรอกรหัสผ่านที่ Admin ตั้งให้ (ถ้ามี)">
+          <input type="password" id="log-password" style="width:35%;"placeholder="กรอกรหัสผ่านที่ Admin ตั้งให้">
         </div>
         <button class="primary" id="log-submit">บันทึก</button>
       </div>
