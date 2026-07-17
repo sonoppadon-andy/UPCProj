@@ -274,7 +274,7 @@
     <section class="view active" id="view-leaderboard">
       <div class="banner">
         <div class="eyebrow">ระยะรวมทุกทีม</div>
-        <div class="total" id="team-total">0.0 <span>กม.</span></div>
+        <div class="total" id="team-total">0.0 <span>KM</span></div>
         <div class="sub" id="team-sub">รอข้อมูล...</div>
       </div>
       <div id="leaderboard-list"><div class="skeleton">กำลังโหลด...</div></div>
@@ -297,7 +297,7 @@
           <label for="log-distance">ระยะทาง</label>
           <div class="distance-input-wrap">
             <input type="number" id="log-distance" step="0.1" min="0" placeholder="0.0">
-            <span> กม.</span>  
+            <span> KM </span>  
           </div>
         </div>
         <div class="field">
@@ -351,7 +351,7 @@
           <h2 class="section-title">จัดการรายการทั้งหมด</h2>
           <div style="overflow-x:auto;">
             <table id="admin-table">
-              <thead><tr><th>รูป</th><th>ชื่อ</th><th>ทีม</th><th>กม.</th><th>วันที่</th><th></th></tr></thead>
+              <thead><tr><th>รูป</th><th>ชื่อ</th><th>ทีม</th><th>KM</th><th>วันที่</th><th></th></tr></thead>
               <tbody id="admin-tbody"></tbody>
             </table>
           </div>
@@ -562,7 +562,7 @@ let expandedTeams = new Set();
 function renderLeaderboard(){
   const teams = aggregateTeams();
   const teamTotal = teams.reduce((s,t)=> s + t.total, 0);
-  document.getElementById('team-total').innerHTML = fmt(teamTotal) + ' <span>กม.</span>';
+  document.getElementById('team-total').innerHTML = fmt(teamTotal) + ' <span>KM</span>';
   document.getElementById('team-sub').textContent = teams.length
     ? `จาก ${teams.length} ทีม · ${runs.length} ครั้งที่บันทึก`
     : 'ยังไม่มีการบันทึก';
@@ -582,7 +582,7 @@ function renderLeaderboard(){
         <span class="m-rank">${mi+1}</span>
         <span class="m-name">${escapeHtml(m.name)}</span>
         <span class="m-count">${m.count} ครั้ง</span>
-        <span class="m-dist">${fmt(m.total)} กม.</span>
+        <span class="m-dist">${fmt(m.total)} KM</span>
       </div>`).join('');
     return `<div class="lane rank-${rank}${isOpen ? ' expanded' : ''}" data-team="${escapeHtml(t.team)}">
       <div class="fill" style="width:0%" data-target="${pct}"></div>
@@ -592,7 +592,7 @@ function renderLeaderboard(){
           <div class="lane-name">${escapeHtml(t.team)}</div>
           <div class="lane-meta">${t.members.length} สมาชิก · ${t.count} ครั้งที่บันทึก</div>
         </div>
-        <div class="lane-dist">${fmt(t.total)}<span>กม.</span></div>
+        <div class="lane-dist">${fmt(t.total)}<span>KM</span></div>
         <div class="lane-chevron">&#9656;</div>
       </div>
     </div>
@@ -669,7 +669,7 @@ function renderHistory(){
     return `<div class="hist-item">
       ${photo}
       <div class="hist-info">
-        <div class="hist-dist">${fmt(r.distance)} กม.</div>
+        <div class="hist-dist">${fmt(r.distance)} KM</div>
         <div class="hist-date">${fmtDate(r.date)}</div>
       </div>
     </div>`;
@@ -726,7 +726,7 @@ document.getElementById('log-submit').addEventListener('click', async ()=>{
   btn.disabled = false; btn.textContent = 'บันทึก';
 
   if(ok){
-    showToast(`บันทึก ${fmt(distance)} กม. ให้ ${name} แล้ว`);
+    showToast(`บันทึก ${fmt(distance)} KM ให้ ${name} แล้ว`);
     document.getElementById('log-distance').value = '';
     document.getElementById('log-name').value = '';
     document.getElementById('log-password').value = '';
