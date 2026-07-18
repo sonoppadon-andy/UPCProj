@@ -46,6 +46,11 @@
     padding:18px 16px 0;
     margin:0 -16px;
   }
+  .topbar-logo img {
+  height: 40px;      /* ปรับขนาด Logo ให้พอดีกับ topbar (ควรน้อยกว่าความสูง topbar เล็กน้อย) */
+  width: auto;       /* รักษาอัตราส่วนรูปภาพ */
+  display: block;
+  }
   .brand{
     display:flex; align-items:baseline; gap:10px; padding:0 0 14px;
   }
@@ -270,8 +275,8 @@
     </a>
     </div>
     <div class="brand">
-      <span class="bib">RUN</span>
-      <h1>UPC Project</h1>
+      <!-- <span class="bib">RUN</span> 
+      <h1>UPC Project</h1> -->
     </div>
     <nav>
       <button class="tab-btn active" data-view="leaderboard">Leaderboard</button>
