@@ -1,0 +1,3084 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="UPC 2026 PLAYER DNA แบบประเมินสไตล์การทำงานร่วมกับทีม">
+  <title>UPC 2026 | PLAYER DNA</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-deep: #040a12;
+      --surface: rgba(14, 29, 49, 0.86);
+      --surface-strong: #10243d;
+      --surface-soft: rgba(255, 255, 255, 0.055);
+      --line: rgba(188, 222, 255, 0.16);
+      --text: #f6f9ff;
+      --muted: #a9b8cb;
+      --primary: #55e6c1;
+      --primary-strong: #26cda5;
+      --secondary: #7c8cff;
+      --danger: #ff7a90;
+      --warning: #ffd166;
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+      --role-color: #55e6c1;
+      --role-color-2: #7c8cff;
+      --role-rgb: 85, 230, 193;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 18%, rgba(85, 230, 193, 0.14), transparent 31rem),
+        radial-gradient(circle at 86% 14%, rgba(124, 140, 255, 0.17), transparent 28rem),
+        linear-gradient(145deg, var(--bg-deep), var(--bg) 48%, #0b1830);
+      font-family: "Noto Sans Thai", "Leelawadee UI", "Tahoma", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(85, 230, 193, 0.48);
+      outline-offset: 3px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      color: #07111f;
+      background: #fff;
+      border-radius: 10px;
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .ambient {
+      position: fixed;
+      z-index: -1;
+      width: 22rem;
+      height: 22rem;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.28;
+      pointer-events: none;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .ambient-one {
+      top: 7%;
+      left: -9rem;
+      background: #18d9b1;
+    }
+
+    .ambient-two {
+      right: -8rem;
+      bottom: 5%;
+      background: #6b7cff;
+      animation-delay: -5s;
+    }
+
+    .app-shell {
+      width: min(1120px, calc(100% - 28px));
+      margin: 24px auto;
+    }
+
+    .app-card {
+      position: relative;
+      min-height: calc(100vh - 48px);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(160deg, rgba(18, 39, 65, 0.92), rgba(8, 19, 34, 0.9));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.05), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(124, 140, 255, 0.08), transparent 24rem);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      flex: 0 0 44px;
+      color: #07111f;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #9bf5dd);
+      box-shadow: 0 10px 30px rgba(85, 230, 193, 0.25);
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-title,
+    .brand-subtitle {
+      display: block;
+    }
+
+    .brand-title {
+      overflow: hidden;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+
+    .language-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .language-button {
+      min-width: 42px;
+      min-height: 32px;
+      padding: 5px 10px;
+      color: var(--muted);
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .language-button:hover {
+      color: var(--text);
+    }
+
+    .language-button[aria-pressed="true"] {
+      color: #07111f;
+      background: linear-gradient(110deg, var(--primary), #9bf5dd);
+      box-shadow: 0 8px 20px rgba(85, 230, 193, 0.18);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .privacy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      color: #c8f9ec;
+      border: 1px solid rgba(85, 230, 193, 0.2);
+      border-radius: 999px;
+      background: rgba(85, 230, 193, 0.08);
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .privacy-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 5px rgba(85, 230, 193, 0.12);
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen {
+      min-height: calc(100vh - 138px);
+      padding: clamp(28px, 5vw, 64px);
+      animation: screenIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+      gap: clamp(30px, 5vw, 72px);
+      align-items: center;
+      min-height: calc(100vh - 240px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 17px;
+      color: #b9c4ff;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .hero-title {
+      max-width: 780px;
+      margin-bottom: 22px;
+      font-size: clamp(2.65rem, 6vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .hero-title span {
+      display: block;
+      color: transparent;
+      background: linear-gradient(100deg, var(--primary), #b3fff0 45%, #9ca8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .hero-lead {
+      max-width: 680px;
+      margin-bottom: 26px;
+      color: #c0cadd;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      color: #dbe5f5;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.84rem;
+    }
+
+    .meta-chip strong {
+      color: var(--primary);
+    }
+
+    .role-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-role {
+      min-height: 116px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .mini-role-icon {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 12px;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .mini-role strong,
+    .mini-role small {
+      display: block;
+    }
+
+    .mini-role strong {
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+    }
+
+    .mini-role small {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
+    .start-panel {
+      padding: clamp(22px, 4vw, 32px);
+      border: 1px solid rgba(191, 222, 255, 0.2);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+        rgba(7, 18, 32, 0.58);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    }
+
+    .panel-kicker {
+      margin-bottom: 7px;
+      color: var(--primary);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .start-panel h2 {
+      margin-bottom: 7px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1.25;
+    }
+
+    .panel-copy {
+      margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      color: #e9f0fa;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .field label span {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 50px;
+      padding: 12px 15px;
+      color: var(--text);
+      border: 1px solid rgba(191, 222, 255, 0.18);
+      border-radius: 13px;
+      background: rgba(3, 10, 18, 0.55);
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .field input::placeholder {
+      color: #74849b;
+    }
+
+    .field input:focus {
+      border-color: rgba(85, 230, 193, 0.65);
+      background: rgba(3, 10, 18, 0.8);
+    }
+
+    .fine-print {
+      display: flex;
+      gap: 10px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .fine-print svg {
+      flex: 0 0 auto;
+      margin-top: 3px;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 50px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease, background 180ms ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+
+    .btn-primary {
+      width: 100%;
+      color: #04110d;
+      background: linear-gradient(110deg, var(--primary), #9bf5dd);
+      box-shadow: 0 14px 34px rgba(85, 230, 193, 0.22);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 18px 42px rgba(85, 230, 193, 0.3);
+    }
+
+    .btn-secondary {
+      color: #e8edf7;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.055);
+    }
+
+    .btn-ghost {
+      color: #cbd6e6;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .btn-icon {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    .quiz-screen {
+      display: grid;
+      align-content: center;
+    }
+
+    .quiz-wrap {
+      width: min(820px, 100%);
+      margin: 0 auto;
+    }
+
+    .quiz-head {
+      margin-bottom: 26px;
+    }
+
+    .quiz-head-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .mission-label {
+      margin: 0 0 3px;
+      color: #b8c4ff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .question-count {
+      margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      line-height: 1.2;
+    }
+
+    .progress-percent {
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      box-shadow: 0 0 22px rgba(85, 230, 193, 0.34);
+      transition: width 360ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .question-panel {
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.068), rgba(255, 255, 255, 0.022)),
+        rgba(8, 19, 34, 0.66);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+    }
+
+    .question-stage {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--primary);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .question-stage::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 6px rgba(85, 230, 193, 0.1);
+    }
+
+    .question-text {
+      margin-bottom: 24px;
+      font-size: clamp(1.25rem, 2.6vw, 1.7rem);
+      line-height: 1.48;
+      letter-spacing: -0.018em;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer-option {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .answer-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option-content {
+      display: grid;
+      grid-template-columns: 42px 1fr 26px;
+      gap: 13px;
+      align-items: center;
+      min-height: 68px;
+      padding: 12px 15px;
+      border: 1px solid rgba(191, 222, 255, 0.15);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.035);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .answer-option:hover .option-content {
+      transform: translateX(3px);
+      border-color: rgba(85, 230, 193, 0.32);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .answer-option input:focus-visible + .option-content {
+      outline: 3px solid rgba(85, 230, 193, 0.45);
+      outline-offset: 3px;
+    }
+
+    .answer-option input:checked + .option-content {
+      border-color: rgba(85, 230, 193, 0.72);
+      background: linear-gradient(100deg, rgba(85, 230, 193, 0.14), rgba(124, 140, 255, 0.09));
+      box-shadow: inset 0 0 0 1px rgba(85, 230, 193, 0.14), 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .option-letter {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: #dce6f4;
+      border: 1px solid rgba(191, 222, 255, 0.17);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 0.86rem;
+      font-weight: 900;
+      transition: color 180ms ease, background 180ms ease;
+    }
+
+    .answer-option input:checked + .option-content .option-letter {
+      color: #04110d;
+      border-color: transparent;
+      background: var(--primary);
+    }
+
+    .option-text {
+      color: #e7edf7;
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    .option-check {
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: transparent;
+      border: 1px solid rgba(191, 222, 255, 0.22);
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 900;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .answer-option input:checked + .option-content .option-check {
+      color: #04110d;
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .quiz-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .quiz-actions .btn {
+      min-width: 132px;
+    }
+
+    .keyboard-hint {
+      color: #75859b;
+      font-size: 0.73rem;
+      text-align: center;
+    }
+
+    .shake {
+      animation: shake 380ms ease;
+    }
+
+    .analyzing {
+      position: fixed;
+      z-index: 90;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(3, 9, 16, 0.82);
+      backdrop-filter: blur(13px);
+      -webkit-backdrop-filter: blur(13px);
+    }
+
+    .analyzing-card {
+      width: min(430px, 100%);
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: #0e2138;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .scanner {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 22px;
+      border: 1px solid rgba(85, 230, 193, 0.25);
+      border-radius: 25px;
+      background: rgba(85, 230, 193, 0.07);
+      overflow: hidden;
+    }
+
+    .scanner::before,
+    .scanner::after {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border: 2px solid rgba(85, 230, 193, 0.35);
+      border-radius: 15px;
+    }
+
+    .scanner::after {
+      inset: 0 9px auto;
+      height: 2px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--primary);
+      box-shadow: 0 0 17px var(--primary);
+      animation: scan 1.1s ease-in-out infinite alternate;
+    }
+
+    .analyzing-card h2 {
+      margin-bottom: 7px;
+    }
+
+    .analyzing-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .result-screen {
+      --role-color: #55e6c1;
+      --role-color-2: #7c8cff;
+      --role-rgb: 85, 230, 193;
+    }
+
+    .result-screen[data-role="Playmaker"] {
+      --role-color: #ffd166;
+      --role-color-2: #ff9f43;
+      --role-rgb: 255, 209, 102;
+    }
+
+    .result-screen[data-role="Striker"] {
+      --role-color: #ff6b7d;
+      --role-color-2: #ff3d68;
+      --role-rgb: 255, 107, 125;
+    }
+
+    .result-screen[data-role="Defender"] {
+      --role-color: #63b3ff;
+      --role-color-2: #4989ff;
+      --role-rgb: 99, 179, 255;
+    }
+
+    .result-screen[data-role="Captain"] {
+      --role-color: #bd82ff;
+      --role-color-2: #8858ff;
+      --role-rgb: 189, 130, 255;
+    }
+
+    .result-wrap {
+      width: min(960px, 100%);
+      margin: 0 auto;
+    }
+
+    .result-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 5vw, 52px);
+      border: 1px solid rgba(var(--role-rgb), 0.3);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 82% 8%, rgba(var(--role-rgb), 0.22), transparent 25rem),
+        linear-gradient(145deg, rgba(var(--role-rgb), 0.11), rgba(255, 255, 255, 0.025));
+      text-align: center;
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.25);
+    }
+
+    .result-hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: -110px;
+      width: 250px;
+      height: 250px;
+      border: 38px solid rgba(var(--role-rgb), 0.055);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .result-label {
+      margin-bottom: 12px;
+      color: var(--role-color);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }
+
+    .role-emblem {
+      display: grid;
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 18px;
+      place-items: center;
+      color: #07111f;
+      border: 8px solid rgba(255, 255, 255, 0.16);
+      border-radius: 29px;
+      background: linear-gradient(135deg, var(--role-color), var(--role-color-2));
+      box-shadow: 0 20px 50px rgba(var(--role-rgb), 0.26);
+      font-size: 2.5rem;
+      transform: rotate(-4deg);
+    }
+
+    .result-name {
+      margin-bottom: 6px;
+      color: #cfd9e8;
+      font-size: 0.92rem;
+    }
+
+    .role-name {
+      margin-bottom: 4px;
+      color: transparent;
+      background: linear-gradient(100deg, var(--role-color), var(--role-color-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      font-size: clamp(2.5rem, 7vw, 5.6rem);
+      line-height: 1;
+      letter-spacing: -0.055em;
+      text-transform: uppercase;
+    }
+
+    .role-thai {
+      margin-bottom: 18px;
+      color: #fff;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      font-weight: 800;
+    }
+
+    .role-tagline {
+      max-width: 720px;
+      margin: 0 auto;
+      color: #c0cada;
+      font-size: clamp(0.98rem, 2vw, 1.13rem);
+    }
+
+    .secondary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 8px 13px;
+      color: #d9e2ef;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.14);
+      font-size: 0.78rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .result-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.038);
+    }
+
+    .result-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+      font-size: 1.04rem;
+    }
+
+    .result-card h3::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--role-color);
+      box-shadow: 0 0 0 6px rgba(var(--role-rgb), 0.09);
+    }
+
+    .result-card p {
+      margin-bottom: 0;
+      color: #b7c3d4;
+      font-size: 0.91rem;
+    }
+
+    .strength-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .strength-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #dce5f2;
+      font-size: 0.9rem;
+    }
+
+    .strength-list li::before {
+      content: "✓";
+      display: grid;
+      width: 21px;
+      height: 21px;
+      margin-top: 1px;
+      place-items: center;
+      flex: 0 0 21px;
+      color: #07111f;
+      border-radius: 50%;
+      background: var(--role-color);
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .score-card {
+      grid-row: span 2;
+    }
+
+    .score-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 17px;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 44px;
+      gap: 11px;
+      align-items: center;
+    }
+
+    .score-label {
+      color: #d8e1ed;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .score-track {
+      display: block;
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .score-fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--role-color), var(--role-color-2));
+      transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .score-value {
+      color: #aebacd;
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .result-note {
+      margin-top: 15px !important;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: #8493a8 !important;
+      font-size: 0.75rem !important;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 11px;
+      margin-top: 24px;
+    }
+
+    .result-actions .btn {
+      min-width: 164px;
+    }
+
+    .result-actions .btn-primary {
+      width: auto;
+    }
+
+    .save-image-button {
+      min-width: 250px !important;
+    }
+
+    .save-image-button[aria-busy="true"] {
+      cursor: wait;
+      opacity: 0.82;
+    }
+
+    .save-image-button[aria-busy="true"] .btn-icon {
+      animation: savePulse 850ms ease-in-out infinite alternate;
+    }
+
+    @keyframes savePulse {
+      from {
+        transform: translateY(-2px);
+        opacity: 0.55;
+      }
+      to {
+        transform: translateY(2px);
+        opacity: 1;
+      }
+    }
+
+    .save-image-hint {
+      margin: 12px auto 0;
+      color: #91a0b5;
+      font-size: 0.76rem;
+      text-align: center;
+    }
+
+    .event-disclaimer {
+      max-width: 760px;
+      margin: 24px auto 0;
+      color: #7f8da1;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 120;
+      left: 50%;
+      bottom: 24px;
+      max-width: min(420px, calc(100% - 30px));
+      padding: 12px 17px;
+      color: #07111f;
+      border-radius: 999px;
+      background: #f4f8ff;
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.34);
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-align: center;
+      transform: translate(-50%, 130%);
+      opacity: 0;
+      transition: transform 240ms ease, opacity 240ms ease;
+    }
+
+    .toast.is-visible {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    .confetti {
+      position: fixed;
+      z-index: 80;
+      top: -22px;
+      width: 8px;
+      height: 15px;
+      border-radius: 3px;
+      background: var(--role-color);
+      pointer-events: none;
+      animation: confettiFall var(--duration, 2.8s) linear forwards;
+      transform: translate3d(0, -20px, 0) rotate(0);
+    }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @keyframes screenIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes drift {
+      to {
+        transform: translate3d(36px, -24px, 0) scale(1.12);
+      }
+    }
+
+    @keyframes scan {
+      from {
+        transform: translateY(10px);
+      }
+      to {
+        transform: translateY(70px);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-8px);
+      }
+      75% {
+        transform: translateX(8px);
+      }
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translate3d(var(--drift, 0), 110vh, 0) rotate(var(--spin, 720deg));
+        opacity: 0.85;
+      }
+    }
+
+    @media (max-width: 880px) {
+      .hero-layout,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-layout {
+        min-height: auto;
+      }
+
+      .role-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .score-card {
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app-shell {
+        width: min(100% - 16px, 1120px);
+        margin: 8px auto;
+      }
+
+      .app-card {
+        min-height: calc(100vh - 16px);
+        border-radius: 22px;
+      }
+
+      .topbar {
+        padding: 16px 17px;
+      }
+
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+        border-radius: 13px;
+      }
+
+      .brand-title {
+        font-size: 0.78rem;
+        letter-spacing: 0.035em;
+      }
+
+      .topbar-actions {
+        gap: 6px;
+      }
+
+      .language-switch {
+        padding: 3px;
+      }
+
+      .language-button {
+        min-width: 37px;
+        min-height: 30px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+      }
+
+      .privacy-pill {
+        width: 34px;
+        height: 34px;
+        max-width: none;
+        padding: 0;
+        justify-content: center;
+        flex: 0 0 34px;
+        overflow: hidden;
+        font-size: 0;
+      }
+
+      .privacy-pill::before {
+        width: 8px;
+        height: 8px;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .screen {
+        min-height: calc(100vh - 92px);
+        padding: 24px 17px 28px;
+      }
+
+      .hero-title {
+        font-size: clamp(2.6rem, 15vw, 4.2rem);
+      }
+
+      .role-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .mini-role {
+        min-height: 104px;
+      }
+
+      .question-panel {
+        padding: 20px 15px;
+      }
+
+      .option-content {
+        grid-template-columns: 39px 1fr 22px;
+        gap: 10px;
+        min-height: 72px;
+        padding: 11px 12px;
+      }
+
+      .option-text {
+        font-size: 0.89rem;
+      }
+
+      .quiz-actions {
+        align-items: stretch;
+      }
+
+      .quiz-actions .btn {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .keyboard-hint {
+        display: none;
+      }
+
+      .result-hero,
+      .result-card {
+        padding: 21px 17px;
+      }
+
+      .score-row {
+        grid-template-columns: 78px 1fr 39px;
+      }
+
+      .result-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .result-actions .btn,
+      .result-actions .btn-primary {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      :root {
+        --text: #111827;
+        --muted: #4b5563;
+      }
+
+      body {
+        color: #111827;
+        background: #fff;
+      }
+
+      .ambient,
+      .topbar,
+      #intro-screen,
+      #quiz-screen,
+      .result-actions,
+      .event-disclaimer,
+      .toast,
+      .confetti {
+        display: none !important;
+      }
+
+      .app-shell {
+        width: 100%;
+        margin: 0;
+      }
+
+      .app-card {
+        min-height: auto;
+        border: 0;
+        border-radius: 0;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .screen {
+        min-height: auto;
+        padding: 0;
+      }
+
+      #result-screen {
+        display: block !important;
+      }
+
+      .result-hero,
+      .result-card {
+        color: #111827;
+        break-inside: avoid;
+        border-color: #d1d5db;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .role-tagline,
+      .result-card p,
+      .strength-list li,
+      .score-label,
+      .score-value,
+      .result-name {
+        color: #374151 !important;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" id="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <div class="app-card">
+      <header class="topbar">
+        <div class="brand" aria-label="UPC 2026 PLAYER DNA">
+          <div class="brand-mark" aria-hidden="true">▶</div>
+          <div class="brand-copy">
+            <span class="brand-title">UPC 2026 · PLAYER DNA [R0.1]</span>
+            <span class="brand-subtitle">TEAM DISCOVERY EXPERIENCE</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="language-switch" role="group" aria-label="Language">
+            <button class="language-button" id="lang-th" type="button" data-lang="th" aria-pressed="true">TH</button>
+            <button class="language-button" id="lang-en" type="button" data-lang="en" aria-pressed="false">EN</button>
+          </div>
+          <div class="privacy-pill" id="privacy-pill">ประมวลผลบนอุปกรณ์นี้</div>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <section class="screen" id="intro-screen" aria-labelledby="intro-title">
+          <div class="hero-layout">
+            <div>
+              <p class="eyebrow" id="intro-eyebrow">Unlock your team superpower</p>
+              <h1 class="hero-title" id="intro-title">
+                What kind of
+                <span>PLAYER are you?</span>
+              </h1>
+              <p class="hero-lead" id="hero-lead">
+                ทุกทีมมีผู้เล่นหลายแบบ มาถอดรหัสสไตล์การทำงานของคุณ
+                และค้นหาว่าคุณคือจิ๊กซอว์ชิ้นไหนที่ช่วยให้ทีมไปถึงเส้นชัย
+              </p>
+
+              <div class="meta-row" id="meta-row" aria-label="รายละเอียดแบบประเมิน">
+                <span class="meta-chip"><strong>9</strong> <span id="meta-questions">คำถาม</span></span>
+                <span class="meta-chip"><strong>3</strong> <span id="meta-minutes">นาทีโดยประมาณ</span></span>
+                <span class="meta-chip" id="meta-no-wrong">ไม่มีคำตอบถูกหรือผิด</span>
+              </div>
+
+              <div class="role-strip" id="role-strip" aria-label="รูปแบบผู้เล่นทั้งสี่">
+                <article class="mini-role">
+                  <span class="mini-role-icon" aria-hidden="true">🟡</span>
+                  <strong>PLAYMAKER</strong>
+                  <small id="mini-playmaker">เชื่อมคนและไอเดีย</small>
+                </article>
+                <article class="mini-role">
+                  <span class="mini-role-icon" aria-hidden="true">🔴</span>
+                  <strong>STRIKER</strong>
+                  <small id="mini-striker">เร่งพลังให้เกิดผลลัพธ์</small>
+                </article>
+                <article class="mini-role">
+                  <span class="mini-role-icon" aria-hidden="true">🔵</span>
+                  <strong>DEFENDER</strong>
+                  <small id="mini-defender">ดูแลคุณภาพและความเสี่ยง</small>
+                </article>
+                <article class="mini-role">
+                  <span class="mini-role-icon" aria-hidden="true">🟣</span>
+                  <strong>CAPTAIN</strong>
+                  <small id="mini-captain">พาทีมไปด้วยกัน</small>
+                </article>
+              </div>
+            </div>
+
+            <form class="start-panel" id="start-form">
+              <p class="panel-kicker" id="panel-kicker">Ready for the mission?</p>
+              <h2 id="start-title">ใส่ข้อมูลเล็กน้อยก่อนเริ่ม</h2>
+              <p class="panel-copy" id="panel-copy">
+                ข้อมูลนี้ใช้แสดงบนหน้าผลลัพธ์เท่านั้น เว้นว่างได้หากต้องการทำแบบไม่ระบุตัวตน
+              </p>
+
+              <div class="field">
+                <label for="display-name" id="display-name-label">ชื่อเล่น <span>(ไม่บังคับ)</span></label>
+                <input id="display-name" name="displayName" type="text" maxlength="50" autocomplete="name" placeholder="เช่น เมย์">
+              </div>
+
+              <div class="field">
+                <label for="department" id="department-label">ทีม / BU <span>(ไม่บังคับ)</span></label>
+                <input id="department" name="department" type="text" maxlength="80" autocomplete="organization-title" placeholder="เช่น Digital Solutions">
+              </div>
+
+              <button class="btn btn-primary" id="start-button" type="submit">
+                <span id="start-button-label">เริ่มค้นหา PLAYER DNA</span>
+                <span class="btn-icon" aria-hidden="true">→</span>
+              </button>
+
+              <p class="fine-print" id="fine-print">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 3.5 5 6.6v5.2c0 4.4 2.8 7.5 7 8.7 4.2-1.2 7-4.3 7-8.7V6.6l-7-3.1Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="m9.2 12 1.8 1.8 3.9-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                แบบประเมินนี้ใช้เพื่อการเรียนรู้และการสร้างทีม ไม่ใช่เครื่องมือประเมินผลงานหรือวินิจฉัยบุคลิกภาพ
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <section class="screen quiz-screen" id="quiz-screen" aria-labelledby="question-heading" hidden>
+          <div class="quiz-wrap">
+            <div class="quiz-head">
+              <div class="quiz-head-row">
+                <div>
+                  <p class="mission-label" id="stage-label">MISSION 01</p>
+                  <h2 class="question-count" id="question-count">คำถาม 1 จาก 9</h2>
+                </div>
+                <span class="progress-percent" id="progress-percent">11%</span>
+              </div>
+              <div class="progress-track" aria-hidden="true">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+            </div>
+
+            <div class="question-panel" id="question-panel">
+              <div class="question-stage" id="question-stage">CONNECT</div>
+              <h2 class="question-text" id="question-heading"></h2>
+              <div class="answer-list" id="answer-list" role="radiogroup" aria-labelledby="question-heading"></div>
+            </div>
+
+            <div class="quiz-actions">
+              <button class="btn btn-ghost" id="back-button" type="button">
+                <span class="btn-icon" aria-hidden="true">←</span>
+                <span id="back-button-label">ย้อนกลับ</span>
+              </button>
+              <span class="keyboard-hint" id="keyboard-hint">กด 1–4 เพื่อเลือกคำตอบ</span>
+              <button class="btn btn-primary" id="next-button" type="button" disabled>
+                ถัดไป
+                <span class="btn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen result-screen" id="result-screen" aria-labelledby="role-name" hidden>
+          <div class="result-wrap">
+            <div class="result-hero">
+              <p class="result-label">YOUR PLAYER DNA REVEALED</p>
+              <div class="role-emblem" id="role-emblem" aria-hidden="true">★</div>
+              <p class="result-name" id="result-name"></p>
+              <h1 class="role-name" id="role-name">PLAYMAKER</h1>
+              <p class="role-thai" id="role-thai"></p>
+              <p class="role-tagline" id="role-tagline"></p>
+              <div class="secondary-badge" id="secondary-badge"></div>
+            </div>
+
+            <div class="result-grid">
+              <article class="result-card">
+                <h3 id="strength-heading">จุดแข็งที่ทีมสัมผัสได้</h3>
+                <ul class="strength-list" id="strength-list"></ul>
+              </article>
+
+              <article class="result-card score-card">
+                <h3 id="score-heading">PLAYER DNA ของคุณ</h3>
+                <p id="score-description">คะแนนสะท้อนแนวโน้มจากคำตอบทั้งหมด ไม่ได้ตีกรอบว่าคุณต้องเป็นเพียงบทบาทเดียว</p>
+                <div class="score-list" id="score-list"></div>
+                <p class="result-note" id="result-note">สัดส่วนคำนวณจากคะแนนรวมของแบบประเมิน และอาจไม่รวมกันเป็น 100% จากการปัดเศษ</p>
+              </article>
+
+              <article class="result-card">
+                <h3 id="impact-heading">พลังที่คุณเติมให้ทีม</h3>
+                <p id="team-impact"></p>
+              </article>
+
+              <article class="result-card">
+                <h3 id="growth-heading">ภารกิจอัปเลเวล</h3>
+                <p id="growth-tip"></p>
+              </article>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn btn-primary save-image-button" id="save-image-button" type="button" disabled>
+                <span class="btn-icon" aria-hidden="true">⬇️</span>
+                <span id="save-image-label">กำลังเตรียมรูป...</span>
+              </button>
+              <button class="btn btn-ghost" id="restart-button" type="button">
+                <span id="restart-button-label">ทำแบบทดสอบใหม่</span>
+              </button>
+            </div>
+
+            <p class="save-image-hint" id="save-image-hint">บนมือถือ ให้เลือก “บันทึกรูปภาพ” จากเมนูแชร์เพื่อเก็บลงเครื่อง</p>
+            <p class="event-disclaimer" id="event-disclaimer">
+              ผลลัพธ์นี้เป็นภาพสะท้อนจากสถานการณ์จำลอง 9 ข้อ ควรใช้เป็นจุดเริ่มต้นของบทสนทนาและการทำความเข้าใจทีม
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="analyzing" id="analyzing-overlay" role="status" aria-live="polite" hidden>
+    <div class="analyzing-card">
+      <div class="scanner" aria-hidden="true"></div>
+      <h2 id="analyzing-title">กำลังวิเคราะห์ PLAYER DNA</h2>
+      <p id="analyzing-copy">กำลังเชื่อมคำตอบของคุณเข้ากับพลังทั้ง 4 รูปแบบ...</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    /*
+      การเชื่อมต่อระบบบันทึกผลส่วนกลาง:
+      - ใส่ URL ของ Webhook หรือ Google Apps Script Web App ใน submissionEndpoint
+      - ระบบจะส่ง JSON หลังวิเคราะห์ผลโดยอัตโนมัติ
+      - หากเว้นว่าง คำตอบทั้งหมดจะประมวลผลเฉพาะบนอุปกรณ์ของผู้ใช้
+    */
+    const APP_CONFIG = {
+      appName: "UPC 2026 PLAYER DNA",
+      version: "2.1.0",
+      submissionEndpoint: "",
+      storageKey: "upc2026-player-dna-session-v2",
+      languageKey: "upc2026-player-dna-language"
+    };
+
+
+    const I18N = {
+      th: {
+        htmlLang: "th",
+        ui: {
+          skipLink: "ข้ามไปยังเนื้อหาหลัก",
+          privacyLocal: "ประมวลผลบนอุปกรณ์นี้",
+          privacyConnected: "เชื่อมต่อระบบบันทึกผลแล้ว",
+          introEyebrow: "Unlock your team superpower",
+          heroLead: "ทุกทีมมีผู้เล่นหลายแบบ มาถอดรหัสสไตล์การทำงานของคุณ และค้นหาว่าคุณคือจิ๊กซอว์ชิ้นไหนที่ช่วยให้ทีมไปถึงเส้นชัย",
+          metaQuestions: "คำถาม",
+          metaMinutes: "นาทีโดยประมาณ",
+          metaNoWrong: "ไม่มีคำตอบถูกหรือผิด",
+          metaAria: "รายละเอียดแบบประเมิน",
+          roleAria: "รูปแบบผู้เล่นทั้งสี่",
+          miniPlaymaker: "เชื่อมคนและไอเดีย",
+          miniStriker: "เร่งพลังให้เกิดผลลัพธ์",
+          miniDefender: "ดูแลคุณภาพและความเสี่ยง",
+          miniCaptain: "พาทีมไปด้วยกัน",
+          panelKicker: "Ready for the mission?",
+          startTitle: "ใส่ข้อมูลเล็กน้อยก่อนเริ่ม",
+          panelCopy: "ข้อมูลนี้ใช้แสดงบนหน้าผลลัพธ์เท่านั้น เว้นว่างได้หากต้องการทำแบบไม่ระบุตัวตน",
+          displayNameLabel: 'ชื่อเล่น <span>(ไม่บังคับ)</span>',
+          displayNamePlaceholder: "เช่น เมย์",
+          departmentLabel: 'ทีม / BU <span>(ไม่บังคับ)</span>',
+          departmentPlaceholder: "เช่น Digital Solutions",
+          startButton: "เริ่มค้นหา PLAYER DNA",
+          finePrint: "แบบประเมินนี้ใช้เพื่อการเรียนรู้และการสร้างทีม ไม่ใช่เครื่องมือประเมินผลงานหรือวินิจฉัยบุคลิกภาพ",
+          questionCount: (current, total) => `คำถาม ${current} จาก ${total}`,
+          chooseAnswer: "เลือกคำตอบที่ใกล้กับตัวคุณที่สุดก่อนนะ",
+          back: "ย้อนกลับ",
+          next: "ถัดไป",
+          analyze: "วิเคราะห์ผลลัพธ์",
+          keyboardHint: "กด 1–4 เพื่อเลือกคำตอบ",
+          answerAria: (value, text) => `ตัวเลือก ${value}: ${text}`,
+          resultLabel: "YOUR PLAYER DNA REVEALED",
+          anonymous: "ผู้เล่นลับ",
+          secondary: role => `พลังรองของคุณ: ${role.toUpperCase()}`,
+          strengthHeading: "จุดแข็งที่ทีมสัมผัสได้",
+          scoreHeading: "PLAYER DNA ของคุณ",
+          scoreDescription: "คะแนนสะท้อนแนวโน้มจากคำตอบทั้งหมด ไม่ได้ตีกรอบว่าคุณต้องเป็นเพียงบทบาทเดียว",
+          resultNote: "สัดส่วนคำนวณจากคะแนนรวมของแบบประเมิน และอาจไม่รวมกันเป็น 100% จากการปัดเศษ",
+          impactHeading: "พลังที่คุณเติมให้ทีม",
+          growthHeading: "ภารกิจอัปเลเวล",
+          preparingImage: "กำลังเตรียมรูป...",
+          saveImage: "บันทึกรูปลงมือถือ",
+          retryImage: "ลองสร้างรูปอีกครั้ง",
+          restart: "ทำแบบทดสอบใหม่",
+          saveHint: "บนมือถือ ให้เลือก “บันทึกรูปภาพ” จากเมนูแชร์เพื่อเก็บลงเครื่อง",
+          disclaimer: "ผลลัพธ์นี้เป็นภาพสะท้อนจากสถานการณ์จำลอง 9 ข้อ ควรใช้เป็นจุดเริ่มต้นของบทสนทนาและการทำความเข้าใจทีม",
+          analyzingTitle: "กำลังวิเคราะห์ PLAYER DNA",
+          analyzingCopy: "กำลังเชื่อมคำตอบของคุณเข้ากับพลังทั้ง 4 รูปแบบ...",
+          preparingToast: "กำลังเตรียมรูป กรุณาแตะอีกครั้งเมื่อปุ่มพร้อม",
+          imageFailed: "ยังสร้างรูปไม่ได้ กรุณาลองอีกครั้ง",
+          shareDone: "ดำเนินการกับรูปเรียบร้อย",
+          shareCanceled: "ยกเลิกการบันทึกรูป",
+          downloaded: "ดาวน์โหลดรูป PNG แล้ว",
+          saved: "บันทึกผลเข้าสู่ระบบเรียบร้อย",
+          saveFailed: "แสดงผลสำเร็จ แต่ยังบันทึกเข้าระบบส่วนกลางไม่ได้",
+          shareText: role => `PLAYER DNA ของฉันคือ ${role.toUpperCase()}`,
+          imageScoreDescription: getUi().imageScoreDescription,
+          imageFooter: "ผลลัพธ์เพื่อการเรียนรู้และการทำความเข้าใจทีม"
+        }
+      },
+      en: {
+        htmlLang: "en",
+        ui: {
+          skipLink: "Skip to main content",
+          privacyLocal: "Processed on this device",
+          privacyConnected: "Results system connected",
+          introEyebrow: "Unlock your team superpower",
+          heroLead: "Every team needs different kinds of players. Decode your working style and discover how your unique strengths help the team reach the finish line.",
+          metaQuestions: "questions",
+          metaMinutes: "minutes approximately",
+          metaNoWrong: "No right or wrong answers",
+          metaAria: "Assessment details",
+          roleAria: "Four player styles",
+          miniPlaymaker: "Connects people and ideas",
+          miniStriker: "Turns energy into results",
+          miniDefender: "Protects quality and manages risk",
+          miniCaptain: "Moves the team forward together",
+          panelKicker: "Ready for the mission?",
+          startTitle: "A few details before you begin",
+          panelCopy: "This information is shown only on your result page. Leave it blank to complete the assessment anonymously.",
+          displayNameLabel: 'Nickname <span>(optional)</span>',
+          displayNamePlaceholder: "e.g. May",
+          departmentLabel: 'Team / BU <span>(optional)</span>',
+          departmentPlaceholder: "e.g. Digital Solutions",
+          startButton: "Discover my PLAYER DNA",
+          finePrint: "This assessment supports learning and team building. It is not a performance evaluation or personality diagnosis.",
+          questionCount: (current, total) => `Question ${current} of ${total}`,
+          chooseAnswer: "Please choose the answer that feels most like you.",
+          back: "Back",
+          next: "Next",
+          analyze: "Analyze result",
+          keyboardHint: "Press 1–4 to choose an answer",
+          answerAria: (value, text) => `Option ${value}: ${text}`,
+          resultLabel: "YOUR PLAYER DNA REVEALED",
+          anonymous: "Anonymous player",
+          secondary: role => `Your secondary strength: ${role.toUpperCase()}`,
+          strengthHeading: "Strengths your team can feel",
+          scoreHeading: "YOUR PLAYER DNA",
+          scoreDescription: "These scores reflect patterns across your answers. They do not limit you to a single role.",
+          resultNote: "Percentages are calculated from the total score and may not add up to exactly 100% due to rounding.",
+          impactHeading: "What you bring to the team",
+          growthHeading: "Your level-up mission",
+          preparingImage: "Preparing image...",
+          saveImage: "Save image to phone",
+          retryImage: "Try creating image again",
+          restart: "Take the assessment again",
+          saveHint: "On mobile, choose “Save Image” from the share menu to keep it on your device.",
+          disclaimer: "This result reflects nine simulated situations. Use it as a starting point for team conversations and mutual understanding.",
+          analyzingTitle: "Analyzing your PLAYER DNA",
+          analyzingCopy: "Connecting your answers with the four player strengths...",
+          preparingToast: "Preparing your image. Tap again when the button is ready.",
+          imageFailed: "The image could not be created. Please try again.",
+          shareDone: "Image action completed.",
+          shareCanceled: "Image saving canceled.",
+          downloaded: "PNG image downloaded.",
+          saved: "Result saved successfully.",
+          saveFailed: "Your result is ready, but it could not be saved to the central system.",
+          shareText: role => `My PLAYER DNA is ${role.toUpperCase()}`,
+          imageScoreDescription: "The scores reflect patterns across all answers, and you may have more than one player strength.",
+          imageFooter: "A result for learning and better team understanding"
+        }
+      }
+    };
+
+    const questions = [{"id":1,"prompt":"คุณเดินเข้ามา... รอบตัวมีแต่หน้าคุ้น ๆ แต่ยังไม่เคยได้ทำความรู้จักกันจริง ๆ ทุกคนกำลังเริ่มต้นทำความรู้จักกัน อะไรคือ 'ท่าไม้ตาย' ที่คุณหยิบมาใช้","options":[{"value":"A","text":"เข้าทักทายด้วยรอยยิ้ม สร้างความเป็นกันเองทันที"},{"value":"B","text":"หาอะไรทำด้วยกันก่อน...เดี๋ยวก็สนิทเอง"},{"value":"C","text":"ขอดูจังหวะก่อน...เดี๋ยวค่อยเข้าไปแจม"},{"value":"D","text":"ชวนทุกคนเริ่มพร้อมกัน...จะได้ไม่มีใครรู้สึกหลุดวง"}]},{"id":2,"prompt":"ทีมถูกสุ่มเรียบร้อยแล้ว สมาชิกทุกคนยังไม่ค่อยรู้จักกัน ถึงเวลาต้องทำภารกิจกับทีมใหม่ สิ่งแรกที่คุณจะทำคือ....","options":[{"value":"A","text":"ชวนทุกคนเข้าวงก่อน...จะได้ไม่มีใครนั่งเงียบ"},{"value":"B","text":"ขอฟังแต่ละคนก่อน...จะได้รู้ว่าใครถนัดอะไร"},{"value":"C","text":"งั้น...เริ่มแนะนำตัวกันก่อนดีไหม จะได้เรียกชื่อถูก"},{"value":"D","text":"หยิบโจทย์ขึ้นมาเลย...เดี๋ยวคุยไป ทำไป"}]},{"id":3,"prompt":"ทีมเริ่มภารกิจแรกแล้วได้เวลาขยับตัว คุณมักจะเริ่มแบบไหน...","options":[{"value":"A","text":"ขอเช็กให้พร้อมก่อน...จะได้ไม่ต้องย้อนกลับมาแก้"},{"value":"B","text":"เดี๋ยว...ลองคุยกันก่อน ใครมีไอเดียอะไรบ้าง"},{"value":"C","text":"พร้อมกันแล้ว...งั้นไปลุยกัน!"},{"value":"D","text":"ลุยก่อนเลย! ถ้าติด เดี๋ยวค่อยหาทาง"}]},{"id":4,"prompt":"ระหว่างภารกิจ คุณลองมองรอบตัวสักนิด คุณคิดว่าคุณได้รู้จักเพื่อน ๆ ทั่วทั้ง S มากน้อยแค่ไหนแล้ว","options":[{"value":"A","text":"มีร้อยคนก็รู้จักร้อยคนเลย เดินไปไหนก็มีคนทัก"},{"value":"B","text":"สักครึ่งหนึ่งได้ ไหมนะ? แต่ยังมีอีกหลายคนที่อยากรู้จัก"},{"value":"C","text":"รู้จักคนนั้น...รู้จักคนนี้...แต่ยังวนอยู่กลุ่มเดิมๆ"},{"value":"D","text":"เดินผ่านกันทุกวัน...แต่ยังแอบคิดว่า \"เอ...อยู่ BU ไหนนะ?\""}]},{"id":5,"prompt":"แผนที่วางไว้เริ่มไม่เป็นไปตามคาดเมื่อทีมเริ่มสะดุด สิ่งแรกที่คุณคิดคือ...","options":[{"value":"A","text":"โอเคๆ ...แก้ก่อน! ดราม่าไว้ทีหลัง"},{"value":"B","text":"ไม่มีอะไร...เดี๋ยวเราหาทางผ่านไปด้วยกัน"},{"value":"C","text":"ขอไล่ดูทีละจุด...น่าจะมีต้นเหตุอยู่สักตรง"},{"value":"D","text":"เดี๋ยวก่อน...ลองคุยกันก่อนว่าเกิดอะไรขึ้น"}]},{"id":6,"prompt":"เวลาเหลือน้อยกว่าที่คิด ในสภาวะที่ Deadline บีบคั้น... ตอนนี้ทุกนาทีมีค่า อะไรคือวิธีที่คุณเลือกใช้เพื่อให้งานจบสวยๆ....","options":[{"value":"A","text":"ใจเย็น...ขอจัดลำดับงานก่อน จะได้ไม่ต้องแก้ซ้ำ"},{"value":"B","text":"เดดไลน์ไม่รอแล้ว...ลุย!"},{"value":"C","text":"ฮึบอีกนิด...เดี๋ยวก็ถึงเส้นชัยด้วยกัน"},{"value":"D","text":"เดี๋ยว ๆ... ขอเช็กว่าเรายังไปทางเดียวกันอยู่ไหมนะ"}]},{"id":7,"prompt":"ภารกิจลับปรากฏขึ้น ไม่ได้อยู่ในแผน แต่เหมือนมีคะแนนพิเศษซ่อนอยู่... ใจของคุณสั่งว่า...","options":[{"value":"A","text":"ไปสิ...จะได้ไม่มีใครตกขบวน"},{"value":"B","text":"ชวนเพื่อนไปด้วยดีกว่า... เผื่อได้เพื่อนใหม่เพิ่มอีก"},{"value":"C","text":"เอาสิ! ไม่ลองก็ไม่รู้ จัดมา!"},{"value":"D","text":"ขอดูเงื่อนไขแป๊บ...เดี๋ยวพลาดของรางวัล"}]},{"id":8,"prompt":"เพื่อนร่วมทีมคนหนึ่งเริ่มล้า...อีกนิดเดียวจะบรรลุภารกิจแล้ว คุณจะเติมพลังให้ทีม...","options":[{"value":"A","text":"เดี๋ยวลองเข้าไปคุย...บางทีแค่มีคนฟังก็ช่วยได้"},{"value":"B","text":"เดี๋ยวถามก่อน...ติดตรงไหนหรือเปล่า"},{"value":"C","text":"ไม่รีบนะ...เราไปด้วยกัน"},{"value":"D","text":"มา...เดี๋ยวช่วยเอง จะได้ไปต่อ!"}]},{"id":9,"prompt":"ทีมเดินทางมาถึงเส้นชัยเมื่อมองย้อนกลับไป คุณแอบหวังว่าเพื่อนจะพูดถึงคุณว่า...","options":[{"value":"A","text":"ดีใจนะ...ที่เราเดินมาถึงตรงนี้ด้วยกัน"},{"value":"B","text":"ดีนะ... เขาทำให้เรารู้จักกันมากขึ้น"},{"value":"C","text":"ถ้าไม่มีเขา...งานคงไม่เดินเร็วขนาดนี้"},{"value":"D","text":"โชคดีที่มีเขา...หลายอย่างเลยราบรื่น"}]}];
+
+    const questionsEn = [{"id":1,"prompt":"What is your go-to move when you enter a room full of familiar faces you have not really gotten to know yet?","options":[{"value":"A","text":"Walk over with a smile and create a friendly atmosphere right away"},{"value":"B","text":"Find something to do together first; the connection will follow"},{"value":"C","text":"Observe the rhythm first, then join when the timing feels right"},{"value":"D","text":"Invite everyone to begin together so no one feels left out"}]},{"id":2,"prompt":"Your new team has just been assigned, and most members do not know one another. What do you do first?","options":[{"value":"A","text":"Bring everyone into the conversation so no one stays silent"},{"value":"B","text":"Listen to each person first to understand their strengths"},{"value":"C","text":"Suggest introductions first so everyone knows one another's names"},{"value":"D","text":"Pick up the task and start; we can talk while doing"}]},{"id":3,"prompt":"The team's first mission begins. How do you usually get moving?","options":[{"value":"A","text":"Check that everything is ready so we do not have to redo it later"},{"value":"B","text":"Talk first and ask what ideas everyone has"},{"value":"C","text":"Once everyone is ready, let's go together"},{"value":"D","text":"Start now; if we get stuck, we will find a way"}]},{"id":4,"prompt":"During the mission, you look around. How many colleagues across S do you feel you already know?","options":[{"value":"A","text":"I know nearly everyone; wherever I go, someone says hello"},{"value":"B","text":"Maybe about half, and there are still many people I want to know"},{"value":"C","text":"I know people here and there, but mostly within the same groups"},{"value":"D","text":"We pass each other every day, but I still wonder which BU they are in"}]},{"id":5,"prompt":"The plan starts to go off track and the team hits a roadblock. What is your first thought?","options":[{"value":"A","text":"Fix it first; we can discuss the drama later"},{"value":"B","text":"It is okay; we will find a way through together"},{"value":"C","text":"Trace it point by point; there must be a root cause somewhere"},{"value":"D","text":"Pause and talk about what happened first"}]},{"id":6,"prompt":"Time is running out and every minute matters. How do you help the team finish well?","options":[{"value":"A","text":"Stay calm and prioritize the work so we do not create rework"},{"value":"B","text":"The deadline will not wait. Let's move"},{"value":"C","text":"One more push; we will reach the finish line together"},{"value":"D","text":"Pause briefly and check that we are still moving in the same direction"}]},{"id":7,"prompt":"A secret mission appears. It was not in the plan, but bonus points may be hidden there. What does your instinct say?","options":[{"value":"A","text":"Let's go, and make sure no one is left behind"},{"value":"B","text":"Invite someone along; maybe we will make a new connection"},{"value":"C","text":"Absolutely. We will never know unless we try"},{"value":"D","text":"Check the conditions first so we do not miss the reward"}]},{"id":8,"prompt":"One teammate is running out of energy, and the finish line is close. How do you recharge the team?","options":[{"value":"A","text":"Talk with them; sometimes having someone listen is enough"},{"value":"B","text":"Ask what is blocking them or where they need help"},{"value":"C","text":"No rush; we will move forward together"},{"value":"D","text":"Come on, I will help so we can keep going"}]},{"id":9,"prompt":"The team reaches the finish line. Looking back, what do you hope your teammates say about you?","options":[{"value":"A","text":"I am glad we reached this point together"},{"value":"B","text":"They helped us get to know one another better"},{"value":"C","text":"Without them, the work would not have moved this fast"},{"value":"D","text":"Luckily they were there; many things went smoothly"}]}];
+
+    const scoringMap = {
+      1: { weight: 1, A: "Playmaker", B: "Striker", C: "Defender", D: "Captain" },
+      2: { weight: 2, A: "Captain", B: "Defender", C: "Playmaker", D: "Striker" },
+      3: { weight: 2, A: "Defender", B: "Playmaker", C: "Captain", D: "Striker" },
+      4: { weight: 0, A: "None", B: "None", C: "None", D: "None" },
+      5: { weight: 3, A: "Striker", B: "Captain", C: "Defender", D: "Playmaker" },
+      6: { weight: 3, A: "Defender", B: "Striker", C: "Captain", D: "Playmaker" },
+      7: { weight: 1, A: "Captain", B: "Playmaker", C: "Striker", D: "Defender" },
+      8: { weight: 3, A: "Playmaker", B: "Defender", C: "Captain", D: "Striker" },
+      9: { weight: 2, A: "Captain", B: "Playmaker", C: "Striker", D: "Defender" }
+    };
+
+    const roleOrder = ["Playmaker", "Striker", "Defender", "Captain"];
+
+    const imagePalettes = {
+      Playmaker: { start: "#FFD166", end: "#FF9F43" },
+      Striker: { start: "#FF6B7D", end: "#FF3D68" },
+      Defender: { start: "#63B3FF", end: "#4989FF" },
+      Captain: { start: "#BD82FF", end: "#8858FF" }
+    };
+
+    const roleProfiles = {
+      Playmaker: {
+        icon: "🟡",
+        thai: "ผู้เชื่อมเกม",
+        tagline: "คุณทำให้คนที่ต่างกันคุยกันรู้เรื่อง และเปลี่ยนบรรยากาศให้ทีมเดินหน้าด้วยกัน",
+        strengths: [
+          "เชื่อมคน ข้อมูล และไอเดียที่กระจัดกระจายให้เห็นภาพเดียวกัน",
+          "สร้างพื้นที่การพูดคุยที่ทำให้คนกล้าเสนอความคิดเห็น",
+          "มองเห็นโอกาสในการร่วมมือก่อนที่คนอื่นจะทันสังเกต"
+        ],
+        impact: "เมื่อมีคุณอยู่ในทีม บทสนทนาจะไหลลื่นขึ้น คนใหม่เข้าวงได้ง่าย และความคิดดี ๆ มีโอกาสถูกต่อยอดเป็นสิ่งที่ใหญ่กว่าเดิม",
+        growth: "หลังเชื่อมทุกคนเข้าหากันแล้ว ลองปิดบทสนทนาด้วยเจ้าของงาน ขั้นตอนถัดไป และเวลาที่ชัดเจน เพื่อเปลี่ยนพลังการเชื่อมโยงให้กลายเป็นผลลัพธ์"
+      },
+      Striker: {
+        icon: "🔴",
+        thai: "ผู้ขับเคลื่อน",
+        tagline: "คุณเปลี่ยนคำว่า “น่าจะทำ” ให้กลายเป็น “ลงมือแล้ว” และสร้างโมเมนตัมให้ทีม",
+        strengths: [
+          "ตัดสินใจและเริ่มลงมือได้ดีภายใต้เวลาที่จำกัด",
+          "ดึงทีมออกจากภาวะลังเลและพาเข้าใกล้เป้าหมาย",
+          "มองหาเส้นทางที่สั้นและเป็นรูปธรรมเพื่อให้งานเดิน"
+        ],
+        impact: "คุณเติมความเร็ว ความกล้า และความรู้สึกว่าเป้าหมายอยู่ใกล้กว่าที่คิด ทีมมักพึ่งคุณในช่วงที่ต้องเร่งเครื่องหรือฝ่าจุดติดขัด",
+        growth: "ก่อนเร่งเต็มกำลัง ลองหยุดเช็กเป้าหมาย ขอบเขต และเสียงของทีมสั้น ๆ การจัดแนวเพียงไม่กี่นาทีจะช่วยให้ความเร็วของคุณไม่พาทีมหลุดเส้นทาง"
+      },
+      Defender: {
+        icon: "🔵",
+        thai: "ผู้คุมมาตรฐาน",
+        tagline: "คุณทำให้ทีมมั่นใจว่าเราไม่ได้แค่ไปถึงเส้นชัย แต่ไปถึงอย่างรอบคอบและไว้ใจได้",
+        strengths: [
+          "มองเห็นรายละเอียด ความเสี่ยง และช่องว่างที่อาจถูกมองข้าม",
+          "จัดระบบและลำดับงานเพื่อป้องกันการย้อนกลับมาแก้ซ้ำ",
+          "รักษาคุณภาพและความต่อเนื่องแม้สถานการณ์จะกดดัน"
+        ],
+        impact: "คุณคือฐานที่ทำให้ทีมยืนได้มั่นคง คนรอบตัวรู้สึกอุ่นใจเมื่อคุณช่วยตรวจทิศทาง ดูความพร้อม และป้องกันปัญหาก่อนเกิด",
+        growth: "กำหนดให้ชัดว่าเรื่องใดต้องสมบูรณ์แบบ และเรื่องใด “ดีพอที่จะเดินต่อ” ได้ การเลือกจุดตรวจที่สำคัญจะช่วยให้ความรอบคอบไม่กลายเป็นคอขวด"
+      },
+      Captain: {
+        icon: "🟣",
+        thai: "ผู้นำทีมไปด้วยกัน",
+        tagline: "คุณมองทั้งเป้าหมายและผู้คน ทำให้ทีมรู้ว่าจะไปไหน และไม่มีใครต้องเดินลำพัง",
+        strengths: [
+          "สร้างทิศทางร่วมและชวนทุกคนมีส่วนในความสำเร็จ",
+          "อ่านพลังของทีมและประคองขวัญกำลังใจในช่วงยาก",
+          "รวมความต่างให้กลายเป็นจังหวะการทำงานที่เป็นทีม"
+        ],
+        impact: "เมื่อมีคุณ ทีมจะเห็นภาพรวมชัดขึ้น รู้สึกเป็นส่วนหนึ่ง และพร้อมรับผิดชอบเป้าหมายร่วมกัน คุณช่วยเปลี่ยนกลุ่มคนให้กลายเป็นทีม",
+        growth: "ฝึกส่งต่อพื้นที่ตัดสินใจและมอบหมายเจ้าของงานให้ชัด คุณไม่จำเป็นต้องถือทุกอย่างไว้เอง การกระจายความเป็นผู้นำจะทำให้ทีมแข็งแรงยิ่งขึ้น"
+      }
+    };
+
+    const stageLabels = [
+      { code: "CONNECT", mission: "MISSION 01 · FIRST CONTACT" },
+      { code: "CONNECT", mission: "MISSION 02 · NEW TEAM" },
+      { code: "ACT", mission: "MISSION 03 · FIRST MOVE" },
+      { code: "DISCOVER", mission: "MISSION 04 · NETWORK" },
+      { code: "ADAPT", mission: "MISSION 05 · RECOVERY" },
+      { code: "DELIVER", mission: "MISSION 06 · DEADLINE" },
+      { code: "EXPLORE", mission: "MISSION 07 · BONUS QUEST" },
+      { code: "SUPPORT", mission: "MISSION 08 · TEAM ENERGY" },
+      { code: "REFLECT", mission: "MISSION 09 · THE FINISH LINE" }
+    ];
+
+
+    const roleProfilesEn = {"Playmaker":{"icon":"🟡","thai":"The Connector","tagline":"You help different people understand one another and turn the atmosphere into forward movement.","strengths":["Connect people, information, and scattered ideas into one shared picture","Create a safe space where people feel comfortable sharing ideas","Spot opportunities for collaboration before others notice them"],"impact":"With you on the team, conversations flow more easily, new people join in faster, and good ideas are more likely to grow into something bigger.","growth":"After connecting everyone, close the conversation with a clear owner, next step, and timeline. This turns your connecting power into visible results."},"Striker":{"icon":"🔴","thai":"The Driver","tagline":"You turn “we should” into “we started” and create momentum for the team.","strengths":["Make decisions and take action well when time is limited","Move the team out of hesitation and closer to the goal","Find direct, practical routes that keep work moving"],"impact":"You bring speed, courage, and the feeling that the goal is closer than it seems. The team often relies on you when it is time to accelerate or break through a blockage.","growth":"Before going full speed, pause briefly to confirm the goal, boundaries, and team input. A few minutes of alignment can keep your speed on the right track."},"Defender":{"icon":"🔵","thai":"The Standard Keeper","tagline":"You help the team reach the finish line with care, quality, and confidence.","strengths":["Notice details, risks, and gaps that others may overlook","Organize and sequence work to prevent repeated rework","Protect quality and continuity even under pressure"],"impact":"You provide the stable foundation the team can trust. People feel reassured when you check direction, readiness, and potential issues before they happen.","growth":"Decide which areas must be perfect and which are good enough to move forward. Choosing the most important checkpoints keeps your thoroughness from becoming a bottleneck."},"Captain":{"icon":"🟣","thai":"The Team Captain","tagline":"You keep both the goal and the people in view, so the team knows where it is going and no one walks alone.","strengths":["Build shared direction and invite everyone to contribute","Read the team's energy and sustain morale through difficult moments","Turn differences into a coordinated team rhythm"],"impact":"With you, the team sees the bigger picture, feels included, and takes shared ownership of the goal. You help turn a group of people into a team.","growth":"Practice sharing decision space and assigning clear ownership. You do not need to carry everything yourself; distributed leadership makes the whole team stronger."}};
+    const stageLabelsEn = [{"code":"CONNECT","mission":"MISSION 01 · FIRST CONTACT"},{"code":"CONNECT","mission":"MISSION 02 · NEW TEAM"},{"code":"ACT","mission":"MISSION 03 · FIRST MOVE"},{"code":"DISCOVER","mission":"MISSION 04 · NETWORK"},{"code":"ADAPT","mission":"MISSION 05 · RECOVERY"},{"code":"DELIVER","mission":"MISSION 06 · DEADLINE"},{"code":"EXPLORE","mission":"MISSION 07 · BONUS QUEST"},{"code":"SUPPORT","mission":"MISSION 08 · TEAM ENERGY"},{"code":"REFLECT","mission":"MISSION 09 · THE FINISH LINE"}];
+
+    let currentLanguage = localStorage.getItem(APP_CONFIG.languageKey) === "en" ? "en" : "th";
+
+    function getUi() {
+      return I18N[currentLanguage].ui;
+    }
+
+    function getQuestions() {
+      return currentLanguage === "en" ? questionsEn : questions;
+    }
+
+    function getRoleProfiles() {
+      return currentLanguage === "en" ? roleProfilesEn : roleProfiles;
+    }
+
+    function getStageLabels() {
+      return currentLanguage === "en" ? stageLabelsEn : stageLabels;
+    }
+
+    const state = {
+      currentIndex: 0,
+      answers: {},
+      profile: { displayName: "", department: "" },
+      result: null,
+      resultImageBlob: null,
+      resultImageFileName: ""
+    };
+
+    const els = {
+      introScreen: document.getElementById("intro-screen"),
+      quizScreen: document.getElementById("quiz-screen"),
+      resultScreen: document.getElementById("result-screen"),
+      startForm: document.getElementById("start-form"),
+      displayName: document.getElementById("display-name"),
+      department: document.getElementById("department"),
+      questionCount: document.getElementById("question-count"),
+      stageLabel: document.getElementById("stage-label"),
+      questionStage: document.getElementById("question-stage"),
+      questionHeading: document.getElementById("question-heading"),
+      answerList: document.getElementById("answer-list"),
+      questionPanel: document.getElementById("question-panel"),
+      progressPercent: document.getElementById("progress-percent"),
+      progressFill: document.getElementById("progress-fill"),
+      backButton: document.getElementById("back-button"),
+      nextButton: document.getElementById("next-button"),
+      analyzingOverlay: document.getElementById("analyzing-overlay"),
+      privacyPill: document.getElementById("privacy-pill"),
+      toast: document.getElementById("toast"),
+      roleEmblem: document.getElementById("role-emblem"),
+      resultName: document.getElementById("result-name"),
+      roleName: document.getElementById("role-name"),
+      roleThai: document.getElementById("role-thai"),
+      roleTagline: document.getElementById("role-tagline"),
+      secondaryBadge: document.getElementById("secondary-badge"),
+      strengthList: document.getElementById("strength-list"),
+      teamImpact: document.getElementById("team-impact"),
+      growthTip: document.getElementById("growth-tip"),
+      scoreList: document.getElementById("score-list"),
+      saveImageButton: document.getElementById("save-image-button"),
+      saveImageLabel: document.getElementById("save-image-label"),
+      restartButton: document.getElementById("restart-button"),
+      langTh: document.getElementById("lang-th"),
+      langEn: document.getElementById("lang-en")
+    };
+
+    let toastTimer = null;
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
+    }
+
+    function applyLanguage() {
+      const ui = getUi();
+      document.documentElement.lang = I18N[currentLanguage].htmlLang;
+      els.langTh.setAttribute("aria-pressed", String(currentLanguage === "th"));
+      els.langEn.setAttribute("aria-pressed", String(currentLanguage === "en"));
+
+      setText("skip-link", ui.skipLink);
+      setText("intro-eyebrow", ui.introEyebrow);
+      setText("hero-lead", ui.heroLead);
+      setText("meta-questions", ui.metaQuestions);
+      setText("meta-minutes", ui.metaMinutes);
+      setText("meta-no-wrong", ui.metaNoWrong);
+      document.getElementById("meta-row")?.setAttribute("aria-label", ui.metaAria);
+      document.getElementById("role-strip")?.setAttribute("aria-label", ui.roleAria);
+      setText("mini-playmaker", ui.miniPlaymaker);
+      setText("mini-striker", ui.miniStriker);
+      setText("mini-defender", ui.miniDefender);
+      setText("mini-captain", ui.miniCaptain);
+      setText("panel-kicker", ui.panelKicker);
+      setText("start-title", ui.startTitle);
+      setText("panel-copy", ui.panelCopy);
+      document.getElementById("display-name-label").innerHTML = ui.displayNameLabel;
+      document.getElementById("department-label").innerHTML = ui.departmentLabel;
+      els.displayName.placeholder = ui.displayNamePlaceholder;
+      els.department.placeholder = ui.departmentPlaceholder;
+      setText("start-button-label", ui.startButton);
+      setText("fine-print", ui.finePrint);
+      setText("back-button-label", ui.back);
+      setText("keyboard-hint", ui.keyboardHint);
+      setText("strength-heading", ui.strengthHeading);
+      setText("score-heading", ui.scoreHeading);
+      setText("score-description", ui.scoreDescription);
+      setText("result-note", ui.resultNote);
+      setText("impact-heading", ui.impactHeading);
+      setText("growth-heading", ui.growthHeading);
+      setText("restart-button-label", ui.restart);
+      setText("save-image-hint", ui.saveHint);
+      setText("event-disclaimer", ui.disclaimer);
+      setText("analyzing-title", ui.analyzingTitle);
+      setText("analyzing-copy", ui.analyzingCopy);
+
+      els.privacyPill.textContent = APP_CONFIG.submissionEndpoint
+        ? ui.privacyConnected
+        : ui.privacyLocal;
+
+      if (!els.quizScreen.hidden) {
+        renderQuestion();
+      }
+
+      if (!els.resultScreen.hidden && state.result) {
+        renderResult(state.result);
+      }
+
+      if (!state.resultImageBlob) {
+        els.saveImageLabel.textContent = ui.preparingImage;
+      }
+    }
+
+    function changeLanguage(language) {
+      if (!["th", "en"].includes(language) || language === currentLanguage) {
+        return;
+      }
+      currentLanguage = language;
+      localStorage.setItem(APP_CONFIG.languageKey, currentLanguage);
+      applyLanguage();
+    }
+
+    function init() {
+      restoreSession();
+      els.displayName.value = state.profile.displayName;
+      els.department.value = state.profile.department;
+
+      els.startForm.addEventListener("submit", startQuiz);
+      els.backButton.addEventListener("click", goBack);
+      els.nextButton.addEventListener("click", goNext);
+      els.saveImageButton.addEventListener("click", saveResultImage);
+      els.restartButton.addEventListener("click", restartQuiz);
+      els.langTh.addEventListener("click", () => changeLanguage("th"));
+      els.langEn.addEventListener("click", () => changeLanguage("en"));
+      document.addEventListener("keydown", handleKeyboard);
+
+      window.addEventListener("beforeunload", saveSession);
+      applyLanguage();
+    }
+
+    function startQuiz(event) {
+      event.preventDefault();
+      state.profile.displayName = els.displayName.value.trim();
+      state.profile.department = els.department.value.trim();
+      state.currentIndex = 0;
+      saveSession();
+      showScreen("quiz");
+      renderQuestion();
+    }
+
+    function showScreen(screen) {
+      els.introScreen.hidden = screen !== "intro";
+      els.quizScreen.hidden = screen !== "quiz";
+      els.resultScreen.hidden = screen !== "result";
+
+      const target = screen === "intro"
+        ? els.introScreen
+        : screen === "quiz"
+          ? els.quizScreen
+          : els.resultScreen;
+
+      target.style.animation = "none";
+      void target.offsetWidth;
+      target.style.animation = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderQuestion() {
+      const activeQuestions = getQuestions();
+      const question = activeQuestions[state.currentIndex];
+      const progress = Math.round(((state.currentIndex + 1) / activeQuestions.length) * 100);
+      const selectedValue = state.answers[question.id] || "";
+
+      els.questionCount.textContent = getUi().questionCount(state.currentIndex + 1, activeQuestions.length);
+      els.stageLabel.textContent = getStageLabels()[state.currentIndex].mission;
+      els.questionStage.textContent = getStageLabels()[state.currentIndex].code;
+      els.questionHeading.textContent = question.prompt;
+      els.progressPercent.textContent = `${progress}%`;
+      els.progressFill.style.width = `${progress}%`;
+      els.nextButton.disabled = !selectedValue;
+      els.nextButton.innerHTML = state.currentIndex === activeQuestions.length - 1
+        ? `${getUi().analyze} <span class="btn-icon" aria-hidden="true">✦</span>`
+        : `${getUi().next} <span class="btn-icon" aria-hidden="true">→</span>`;
+
+      els.answerList.innerHTML = "";
+
+      question.options.forEach((option, index) => {
+        const label = document.createElement("label");
+        label.className = "answer-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `q${question.id}`;
+        input.value = option.value;
+        input.checked = selectedValue === option.value;
+        input.setAttribute("aria-label", getUi().answerAria(option.value, option.text));
+
+        const content = document.createElement("span");
+        content.className = "option-content";
+
+        const letter = document.createElement("span");
+        letter.className = "option-letter";
+        letter.textContent = option.value;
+
+        const text = document.createElement("span");
+        text.className = "option-text";
+        text.textContent = option.text;
+
+        const check = document.createElement("span");
+        check.className = "option-check";
+        check.textContent = "✓";
+        check.setAttribute("aria-hidden", "true");
+
+        content.append(letter, text, check);
+        label.append(input, content);
+        els.answerList.append(label);
+
+        input.addEventListener("change", () => {
+          state.answers[question.id] = option.value;
+          els.nextButton.disabled = false;
+          saveSession();
+        });
+      });
+
+      els.questionPanel.style.animation = "none";
+      void els.questionPanel.offsetWidth;
+      els.questionPanel.style.animation = "screenIn 360ms cubic-bezier(0.22, 1, 0.36, 1) both";
+
+      requestAnimationFrame(() => {
+        const checked = els.answerList.querySelector("input:checked");
+        (checked || els.answerList.querySelector("input"))?.focus({ preventScroll: true });
+      });
+    }
+
+    function goBack() {
+      if (state.currentIndex === 0) {
+        showScreen("intro");
+        els.displayName.focus({ preventScroll: true });
+        return;
+      }
+
+      state.currentIndex -= 1;
+      saveSession();
+      renderQuestion();
+    }
+
+    function goNext() {
+      const activeQuestions = getQuestions();
+      const question = activeQuestions[state.currentIndex];
+
+      if (!state.answers[question.id]) {
+        els.questionPanel.classList.remove("shake");
+        void els.questionPanel.offsetWidth;
+        els.questionPanel.classList.add("shake");
+        showToast(getUi().chooseAnswer);
+        return;
+      }
+
+      if (state.currentIndex < activeQuestions.length - 1) {
+        state.currentIndex += 1;
+        saveSession();
+        renderQuestion();
+        return;
+      }
+
+      analyzeAndShowResult();
+    }
+
+    function handleKeyboard(event) {
+      if (els.quizScreen.hidden) {
+        return;
+      }
+
+      const number = Number(event.key);
+      if (number >= 1 && number <= 4) {
+        const input = els.answerList.querySelectorAll("input")[number - 1];
+        if (input) {
+          input.checked = true;
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+
+      if (event.key === "Enter" && !els.nextButton.disabled) {
+        event.preventDefault();
+        goNext();
+      }
+
+      if (event.key === "ArrowLeft" && !event.target.matches("input")) {
+        goBack();
+      }
+    }
+
+    async function analyzeAndShowResult() {
+      els.analyzingOverlay.hidden = false;
+      document.body.style.overflow = "hidden";
+
+      const result = calculateResult();
+      state.result = result;
+      saveSession();
+
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+
+      renderResult(result);
+      showScreen("result");
+      els.analyzingOverlay.hidden = true;
+      document.body.style.overflow = "";
+      launchConfetti();
+
+      if (APP_CONFIG.submissionEndpoint) {
+        submitResult(result);
+      }
+
+      requestAnimationFrame(() => els.roleName.focus?.({ preventScroll: true }));
+    }
+
+    function calculateResult() {
+      const scores = {
+        Playmaker: 0,
+        Striker: 0,
+        Defender: 0,
+        Captain: 0
+      };
+
+      let levelOneRole = "";
+
+      questions.forEach((question) => {
+        const answer = state.answers[question.id];
+        const mapping = scoringMap[question.id];
+        const role = mapping[answer];
+
+        if (role && role !== "None") {
+          scores[role] += mapping.weight;
+        }
+
+        if (question.id === 1) {
+          levelOneRole = role;
+        }
+      });
+
+      const maxScore = Math.max(...Object.values(scores));
+      const winners = roleOrder.filter((role) => scores[role] === maxScore);
+      const finalRole = winners.length > 1 && winners.includes(levelOneRole)
+        ? levelOneRole
+        : winners[0];
+
+      const sortedRoles = [...roleOrder].sort((a, b) => {
+        const scoreDifference = scores[b] - scores[a];
+        return scoreDifference !== 0
+          ? scoreDifference
+          : roleOrder.indexOf(a) - roleOrder.indexOf(b);
+      });
+
+      return {
+        finalRole,
+        secondaryRole: sortedRoles.find((role) => role !== finalRole),
+        scores,
+        totalScore: Object.values(scores).reduce((sum, score) => sum + score, 0),
+        completedAt: new Date().toISOString()
+      };
+    }
+
+    function renderResult(result) {
+      const profile = getRoleProfiles()[result.finalRole];
+      const displayLabel = [
+        state.profile.displayName || getUi().anonymous,
+        state.profile.department
+      ].filter(Boolean).join(" · ");
+
+      els.resultScreen.dataset.role = result.finalRole;
+      els.roleEmblem.textContent = profile.icon;
+      els.resultName.textContent = displayLabel;
+      els.roleName.textContent = result.finalRole.toUpperCase();
+      els.roleName.setAttribute("tabindex", "-1");
+      els.roleThai.textContent = profile.thai;
+      els.roleTagline.textContent = profile.tagline;
+      els.secondaryBadge.textContent = getUi().secondary(result.secondaryRole);
+      els.teamImpact.textContent = profile.impact;
+      els.growthTip.textContent = profile.growth;
+
+      els.strengthList.innerHTML = "";
+      profile.strengths.forEach((strength) => {
+        const item = document.createElement("li");
+        item.textContent = strength;
+        els.strengthList.append(item);
+      });
+
+      els.scoreList.innerHTML = "";
+      roleOrder.forEach((role) => {
+        const score = result.scores[role];
+        const percent = result.totalScore > 0 ? Math.round((score / result.totalScore) * 100) : 0;
+        const row = document.createElement("div");
+        row.className = "score-row";
+        row.innerHTML = `
+          <span class="score-label">${role.toUpperCase()}</span>
+          <span class="score-track" aria-hidden="true">
+            <span class="score-fill" style="width: 0"></span>
+          </span>
+          <span class="score-value">${percent}%</span>
+        `;
+        els.scoreList.append(row);
+        requestAnimationFrame(() => {
+          row.querySelector(".score-fill").style.width = `${percent}%`;
+        });
+      });
+
+      prepareResultImage();
+    }
+
+    function hexToRgba(hex, alpha) {
+      const normalized = hex.replace("#", "");
+      const value = Number.parseInt(normalized, 16);
+      const red = (value >> 16) & 255;
+      const green = (value >> 8) & 255;
+      const blue = value & 255;
+      return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+    }
+
+    function roundedRectPath(context, x, y, width, height, radius) {
+      const safeRadius = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + safeRadius, y);
+      context.arcTo(x + width, y, x + width, y + height, safeRadius);
+      context.arcTo(x + width, y + height, x, y + height, safeRadius);
+      context.arcTo(x, y + height, x, y, safeRadius);
+      context.arcTo(x, y, x + width, y, safeRadius);
+      context.closePath();
+    }
+
+    function fillRoundedRect(context, x, y, width, height, radius, fillStyle, strokeStyle = null) {
+      roundedRectPath(context, x, y, width, height, radius);
+      context.fillStyle = fillStyle;
+      context.fill();
+      if (strokeStyle) {
+        context.strokeStyle = strokeStyle;
+        context.lineWidth = 2;
+        context.stroke();
+      }
+    }
+
+    function splitLongToken(context, token, maxWidth) {
+      const pieces = [];
+      let current = "";
+
+      Array.from(token).forEach((character) => {
+        const candidate = current + character;
+        if (current && context.measureText(candidate).width > maxWidth) {
+          pieces.push(current);
+          current = character;
+        } else {
+          current = candidate;
+        }
+      });
+
+      if (current) {
+        pieces.push(current);
+      }
+      return pieces;
+    }
+    
+     /*  
+    function wrapCanvasText(context, text, maxWidth) {
+      const source = String(text || "").trim();
+      if (!source) {
+        return [];
+      }
+
+      let tokens;
+      if (typeof Intl !== "undefined" && Intl.Segmenter) {
+        const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+        tokens = Array.from(segmenter.segment(source), ({ segment }) => segment);
+      } else {
+        tokens = source.split(/(\s+)/).filter(Boolean);
+      }
+
+      const lines = [];
+      let line = "";
+
+      tokens.forEach((token) => {
+        const parts = context.measureText(token).width > maxWidth
+          ? splitLongToken(context, token, maxWidth)
+          : [token];
+
+        parts.forEach((part) => {
+          const candidate = line + part;
+          if (line && context.measureText(candidate).width > maxWidth) {
+            lines.push(line.trim());
+            line = part.trimStart();
+          } else {
+            line = candidate;
+          }
+        });
+      });
+
+      if (line.trim()) {
+        lines.push(line.trim());
+      }
+      return lines;
+    } */
+    
+/* raplace wrapCanvasText */
+    function wrapCanvasText(context, text, maxWidth) {
+  const source = String(text || "").trim();
+
+  if (!source) {
+    return [];
+  }
+
+  /*
+    ใช้ Array.from เพื่อแยกข้อความเป็น Unicode characters
+    วิธีนี้ทำงานสม่ำเสมอกว่า Intl.Segmenter บนมือถือ
+  */
+  const characters = Array.from(source);
+  const lines = [];
+
+  let currentLine = "";
+  let lastBreakIndex = -1;
+
+  for (let index = 0; index < characters.length; index += 1) {
+    const character = characters[index];
+    const candidate = currentLine + character;
+
+    // จำตำแหน่งที่เหมาะกับการขึ้นบรรทัดใหม่
+    if (
+      character === " " ||
+      character === "\u200B" ||
+      character === "-" ||
+      character === "–" ||
+      character === "—"
+    ) {
+      lastBreakIndex = currentLine.length;
+    }
+
+    if (currentLine && context.measureText(candidate).width > maxWidth) {
+      /*
+        หากมีช่องว่างในบรรทัด ให้ตัดตรงช่องว่างก่อน
+        เพื่อไม่ให้คำภาษาอังกฤษหรือประโยคดูขาดเกินไป
+      */
+      if (lastBreakIndex >= 0) {
+        const combined = currentLine + character;
+        const firstPart = combined.slice(0, lastBreakIndex + 1).trim();
+        const remainingPart = combined.slice(lastBreakIndex + 1).trimStart();
+
+        if (firstPart) {
+          lines.push(firstPart);
+        }
+
+        currentLine = remainingPart;
+      } else {
+        /*
+          ภาษาไทยไม่มีช่องว่างระหว่างทุกคำ
+          จึงตัดตามความกว้างจริงของ Canvas
+        */
+        lines.push(currentLine.trim());
+        currentLine = character.trimStart();
+      }
+
+      lastBreakIndex = -1;
+    } else {
+      currentLine = candidate;
+    }
+  }
+
+  if (currentLine.trim()) {
+    lines.push(currentLine.trim());
+  }
+
+  return lines;
+}
+    /* end replace */
+    
+    function drawWrappedText(context, text, x, y, maxWidth, options = {}) {
+      const {
+        font = '400 26px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color = "#FFFFFF",
+        lineHeight = 38,
+        align = "left",
+        maxLines = 99
+      } = options;
+
+      context.save();
+      context.font = font;
+      context.fillStyle = color;
+      context.textAlign = align;
+      context.textBaseline = "top";
+
+      let lines = wrapCanvasText(context, text, maxWidth);
+
+// ป้องกันข้อความล้นบน Mobile Browser
+  lines = lines.flatMap((line) => {
+    if (context.measureText(line).width <= maxWidth) {
+      return [line];
+    }
+
+    return splitLongToken(context, line, maxWidth);
+  });
+      
+      if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        let finalLine = lines[maxLines - 1];
+        while (finalLine && context.measureText(`${finalLine}…`).width > maxWidth) {
+          finalLine = finalLine.slice(0, -1);
+        }
+        lines[maxLines - 1] = `${finalLine.trimEnd()}…`;
+      }
+
+      lines.forEach((line, index) => {
+        context.fillText(line, x, y + (index * lineHeight));
+      });
+      context.restore();
+      return y + (lines.length * lineHeight);
+    }
+
+    function drawSectionHeading(context, title, x, y, accentColor) {
+      context.save();
+      context.fillStyle = accentColor;
+      context.beginPath();
+      context.arc(x + 8, y + 17, 8, 0, Math.PI * 2);
+      context.fill();
+      context.font = '800 30px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.fillStyle = "#F8FBFF";
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      context.fillText(title, x + 32, y);
+      context.restore();
+    }
+
+    function drawGlow(context, x, y, radius, color) {
+      const glow = context.createRadialGradient(x, y, 0, x, y, radius);
+      glow.addColorStop(0, hexToRgba(color, 0.28));
+      glow.addColorStop(1, hexToRgba(color, 0));
+      context.fillStyle = glow;
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    function createResultImageCanvas() {
+      if (!state.result) {
+        throw new Error("Result is not available");
+      }
+
+      const width = 1080;
+      const height = 1920;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      const result = state.result;
+      const profile = getRoleProfiles()[result.finalRole];
+      const palette = imagePalettes[result.finalRole];
+      const displayLabel = [
+        state.profile.displayName || getUi().anonymous,
+        state.profile.department
+      ].filter(Boolean).join(" · ");
+
+      context.imageSmoothingEnabled = true;
+      context.textBaseline = "top";
+
+      const background = context.createLinearGradient(0, 0, width, height);
+      background.addColorStop(0, "#030A13");
+      background.addColorStop(0.48, "#07182B");
+      background.addColorStop(1, "#0A1730");
+      context.fillStyle = background;
+      context.fillRect(0, 0, width, height);
+
+      drawGlow(context, 120, 240, 390, palette.start);
+      drawGlow(context, 1010, 420, 430, palette.end);
+      drawGlow(context, 920, 1800, 420, "#55E6C1");
+
+      context.save();
+      context.strokeStyle = "rgba(255, 255, 255, 0.025)";
+      context.lineWidth = 1;
+      for (let x = 0; x <= width; x += 60) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, height);
+        context.stroke();
+      }
+      for (let y = 0; y <= height; y += 60) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(width, y);
+        context.stroke();
+      }
+      context.restore();
+
+      const brandGradient = context.createLinearGradient(64, 54, 140, 130);
+      brandGradient.addColorStop(0, "#55E6C1");
+      brandGradient.addColorStop(1, "#9BF5DD");
+      fillRoundedRect(context, 64, 54, 76, 76, 23, brandGradient);
+      context.save();
+      context.fillStyle = "#07111F";
+      context.beginPath();
+      context.moveTo(95, 76);
+      context.lineTo(95, 108);
+      context.lineTo(119, 92);
+      context.closePath();
+      context.fill();
+      context.restore();
+
+      context.save();
+      context.fillStyle = "#F7FAFF";
+      context.font = '800 28px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.fillText("UPC 2026 · PLAYER DNA", 160, 62);
+      context.fillStyle = "#8FA2BA";
+      context.font = '600 18px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.fillText("TEAM DISCOVERY EXPERIENCE", 160, 103);
+      context.restore();
+
+      fillRoundedRect(
+        context,
+        770,
+        68,
+        246,
+        48,
+        24,
+        "rgba(255, 255, 255, 0.055)",
+        "rgba(255, 255, 255, 0.11)"
+      );
+      context.save();
+      context.fillStyle = "#B8C5D7";
+      context.font = '700 18px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.textAlign = "center";
+      context.fillText("RESULT CARD · 2026", 893, 80);
+      context.restore();
+
+      const heroGradient = context.createLinearGradient(64, 160, 1016, 750);
+      heroGradient.addColorStop(0, hexToRgba(palette.start, 0.15));
+      heroGradient.addColorStop(1, "rgba(255, 255, 255, 0.035)");
+      fillRoundedRect(
+        context,
+        64,
+        160,
+        952,
+        590,
+        42,
+        heroGradient,
+        hexToRgba(palette.start, 0.36)
+      );
+
+      context.save();
+      context.fillStyle = palette.start;
+      context.font = '900 21px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.textAlign = "center";
+      context.letterSpacing = "3px";
+      context.fillText("YOUR PLAYER DNA REVEALED", 540, 202);
+      context.restore();
+
+      const emblemGradient = context.createLinearGradient(476, 248, 604, 376);
+      emblemGradient.addColorStop(0, palette.start);
+      emblemGradient.addColorStop(1, palette.end);
+      context.save();
+      context.shadowColor = hexToRgba(palette.start, 0.38);
+      context.shadowBlur = 45;
+      fillRoundedRect(context, 476, 248, 128, 128, 35, emblemGradient);
+      context.restore();
+      context.save();
+      context.font = '64px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(profile.icon, 540, 312);
+      context.restore();
+
+      drawWrappedText(context, displayLabel, 540, 398, 810, {
+        font: '600 25px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#C7D3E4",
+        lineHeight: 34,
+        align: "center",
+        maxLines: 1
+      });
+
+      context.save();
+      const titleGradient = context.createLinearGradient(250, 0, 830, 0);
+      titleGradient.addColorStop(0, palette.start);
+      titleGradient.addColorStop(1, palette.end);
+      context.fillStyle = titleGradient;
+      context.font = '900 82px "Arial Narrow", "Segoe UI", sans-serif';
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      context.fillText(result.finalRole.toUpperCase(), 540, 438);
+      context.restore();
+
+      drawWrappedText(context, profile.thai, 150, 532, 300, {
+        font: '800 34px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#FFFFFF",
+        lineHeight: 46,
+        align: "left",
+        maxLines: 1
+      });
+
+      drawWrappedText(context, profile.tagline, 150, 585, 740, {
+        font: '500 27px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#BBC8D9",
+        lineHeight: 40,
+        align: "left",
+        maxLines: 2
+      });
+
+      const secondaryText = getUi().secondary(result.secondaryRole);
+      context.save();
+      context.font = '700 21px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      const secondaryWidth = Math.min(context.measureText(secondaryText).width + 58, 620);
+      fillRoundedRect(
+        context,
+        540 - (secondaryWidth / 2),
+        680,
+        secondaryWidth,
+        46,
+        23,
+        "rgba(0, 0, 0, 0.20)",
+        "rgba(255, 255, 255, 0.12)"
+      );
+      context.fillStyle = "#D7E0ED";
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      context.fillText(secondaryText, 410, 691);
+      context.restore();
+
+      fillRoundedRect(
+        context,
+        64,
+        780,
+        952,
+        310,
+        32,
+        "rgba(255, 255, 255, 0.045)",
+        "rgba(255, 255, 255, 0.10)"
+      );
+      drawSectionHeading(context, getUi().strengthHeading, 100, 816, palette.start);
+
+      let strengthY = 872;
+      profile.strengths.forEach((strength) => {
+        context.save();
+        context.fillStyle = palette.start;
+        context.beginPath();
+        context.arc(116, strengthY + 16, 12, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = "#07111F";
+        context.font = '900 17px "Segoe UI", sans-serif';
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText("✓", 116, strengthY + 16);
+        context.restore();
+        const nextY = drawWrappedText(context, strength, 146, strengthY, 820, {
+          font: '500 25px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+          color: "#DCE6F2",
+          lineHeight: 35,
+          maxLines: 2
+        });
+        strengthY = nextY + 12;
+      });
+
+      fillRoundedRect(
+        context,
+        64,
+        1120,
+        952,
+        350,
+        32,
+        "rgba(255, 255, 255, 0.045)",
+        "rgba(255, 255, 255, 0.10)"
+      );
+      drawSectionHeading(context, getUi().scoreHeading, 100, 1156, palette.start);
+      drawWrappedText(context, "คะแนนสะท้อนแนวโน้มจากคำตอบทั้งหมด และคุณอาจมีพลังมากกว่าหนึ่งรูปแบบ", 100, 1205, 850, {
+        font: '400 22px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#93A5BB",
+        lineHeight: 32,
+        maxLines: 1
+      });
+
+      let scoreY = 1247;
+      roleOrder.forEach((role) => {
+        const score = result.scores[role];
+        const percent = result.totalScore > 0 ? Math.round((score / result.totalScore) * 100) : 0;
+        const rolePalette = imagePalettes[role];
+
+        context.save();
+        context.fillStyle = "#D9E3EF";
+        context.font = '800 21px "Segoe UI", sans-serif';
+        context.textAlign = "left";
+        context.textBaseline = "top";
+        context.fillText(role.toUpperCase(), 100, scoreY);
+        context.fillStyle = "#AFC0D4";
+        context.textAlign = "right";
+        context.fillText(`${percent}%`, 980, scoreY);
+        context.restore();
+
+        fillRoundedRect(context, 100, scoreY + 34, 880, 13, 7, "rgba(255, 255, 255, 0.085)");
+        const fillWidth = Math.max(12, 880 * (percent / 100));
+        const barGradient = context.createLinearGradient(100, 0, 100 + fillWidth, 0);
+        barGradient.addColorStop(0, rolePalette.start);
+        barGradient.addColorStop(1, rolePalette.end);
+        fillRoundedRect(context, 100, scoreY + 34, fillWidth, 13, 7, barGradient);
+        scoreY += 52;
+      });
+
+      fillRoundedRect(
+        context,
+        64,
+        1490,
+        460,
+        310,
+        32,
+        "rgba(255, 255, 255, 0.045)",
+        "rgba(255, 255, 255, 0.10)"
+      );
+      drawSectionHeading(context, getUi().impactHeading, 96, 1527, palette.start);
+      drawWrappedText(context, profile.impact, 96, 1580, 396, {
+        font: '500 23px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#C4D0DF",
+        lineHeight: 34,
+        maxLines: 6
+      });
+
+      fillRoundedRect(
+        context,
+        556,
+        1490,
+        460,
+        310,
+        32,
+        "rgba(255, 255, 255, 0.045)",
+        "rgba(255, 255, 255, 0.10)"
+      );
+      drawSectionHeading(context, getUi().growthHeading, 588, 1527, palette.end);
+      drawWrappedText(context, profile.growth, 588, 1580, 396, {
+        font: '500 23px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif',
+        color: "#C4D0DF",
+        lineHeight: 34,
+        maxLines: 6
+      });
+
+      context.save();
+      context.strokeStyle = "rgba(255, 255, 255, 0.09)";
+      context.beginPath();
+      context.moveTo(64, 1842);
+      context.lineTo(1016, 1842);
+      context.stroke();
+      context.fillStyle = "#8294AA";
+      context.font = '500 18px "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif';
+      context.textAlign = "left";
+      context.fillText(getUi().imageFooter, 64, 1866);
+      context.textAlign = "right";
+      context.fillText("UPC 2026", 1016, 1866);
+      context.restore();
+
+      return canvas;
+    }
+
+    function canvasToPngBlob(canvas) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Unable to create PNG image"));
+          }
+        }, "image/png", 1);
+      });
+    }
+
+    function makeResultFileName() {
+      const safeName = (state.profile.displayName || "anonymous")
+        .normalize("NFC")
+        .replace(/[^\p{L}\p{N}\p{M}-]+/gu, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 50);
+      return `UPC2026-PLAYER-DNA-${safeName || "result"}.png`;
+    }
+
+    function downloadImageBlob(blob, fileName) {
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = fileName;
+      link.rel = "noopener";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
+    }
+
+    async function prepareResultImage() {
+      if (!state.result) {
+        return;
+      }
+
+      const resultToken = state.result.completedAt;
+      state.resultImageBlob = null;
+      state.resultImageFileName = makeResultFileName();
+      els.saveImageButton.disabled = true;
+      els.saveImageButton.setAttribute("aria-busy", "true");
+      els.saveImageLabel.textContent = getUi().preparingImage;
+
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        const canvas = createResultImageCanvas();
+        const blob = await canvasToPngBlob(canvas);
+
+        if (!state.result || state.result.completedAt !== resultToken) {
+          return;
+        }
+
+        state.resultImageBlob = blob;
+        els.saveImageButton.disabled = false;
+        els.saveImageButton.removeAttribute("aria-busy");
+        els.saveImageLabel.textContent = getUi().saveImage;
+      } catch (error) {
+        console.error("Unable to prepare result image:", error);
+        els.saveImageButton.disabled = false;
+        els.saveImageButton.removeAttribute("aria-busy");
+        els.saveImageLabel.textContent = getUi().retryImage;
+        showToast(getUi().imageFailed);
+      }
+    }
+
+    function saveResultImage() {
+      if (!state.result) {
+        return;
+      }
+
+      if (!state.resultImageBlob) {
+        prepareResultImage();
+        showToast(getUi().preparingToast);
+        return;
+      }
+
+      const blob = state.resultImageBlob;
+      const fileName = state.resultImageFileName || makeResultFileName();
+
+      try {
+        const file = new File([blob], fileName, { type: "image/png" });
+        const shareData = {
+          files: [file],
+          title: "UPC 2026 · PLAYER DNA",
+          text: getUi().shareText(state.result.finalRole)
+        };
+
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+          navigator.share(shareData).then(() => {
+            showToast(getUi().shareDone);
+          }).catch((error) => {
+            if (error && error.name === "AbortError") {
+              showToast(getUi().shareCanceled);
+              return;
+            }
+            console.warn("Native image sharing is unavailable:", error);
+            downloadImageBlob(blob, fileName);
+            showToast(getUi().downloaded);
+          });
+          return;
+        }
+      } catch (error) {
+        console.warn("Unable to open native image sharing:", error);
+      }
+
+      downloadImageBlob(blob, fileName);
+      showToast(getUi().downloaded);
+    }
+
+    function buildSubmissionPayload(result) {
+      return {
+        app: APP_CONFIG.appName,
+        version: APP_CONFIG.version,
+        submittedAt: result.completedAt,
+        participant: {
+          displayName: state.profile.displayName || null,
+          department: state.profile.department || null
+        },
+        answers: { ...state.answers },
+        result: {
+          finalRole: result.finalRole,
+          secondaryRole: result.secondaryRole,
+          scores: { ...result.scores }
+        }
+      };
+    }
+
+    async function submitResult(result) {
+      try {
+        const response = await fetch(APP_CONFIG.submissionEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildSubmissionPayload(result))
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        showToast(getUi().saved);
+      } catch (error) {
+        console.error("Unable to submit result:", error);
+        showToast(getUi().saveFailed);
+      }
+    }
+
+    function launchConfetti() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+      }
+
+      for (let index = 0; index < 44; index += 1) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 260}px`);
+        piece.style.setProperty("--spin", `${360 + Math.random() * 720}deg`);
+        piece.style.setProperty("--duration", `${2.2 + Math.random() * 1.8}s`);
+        piece.style.animationDelay = `${Math.random() * 0.45}s`;
+        piece.style.background = index % 3 === 0
+          ? "var(--role-color)"
+          : index % 3 === 1
+            ? "var(--role-color-2)"
+            : "#ffffff";
+        document.body.append(piece);
+        window.setTimeout(() => piece.remove(), 4500);
+      }
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("is-visible");
+      toastTimer = window.setTimeout(() => {
+        els.toast.classList.remove("is-visible");
+      }, 2600);
+    }
+
+    function saveSession() {
+      try {
+        sessionStorage.setItem(APP_CONFIG.storageKey, JSON.stringify({
+          currentIndex: state.currentIndex,
+          answers: state.answers,
+          profile: state.profile
+        }));
+      } catch (error) {
+        console.warn("Session storage is unavailable:", error);
+      }
+    }
+
+    function restoreSession() {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(APP_CONFIG.storageKey) || "null");
+        if (!saved || typeof saved !== "object") {
+          return;
+        }
+
+        state.currentIndex = Number.isInteger(saved.currentIndex)
+          ? Math.min(Math.max(saved.currentIndex, 0), questions.length - 1)
+          : 0;
+        state.answers = saved.answers && typeof saved.answers === "object" ? saved.answers : {};
+        state.profile = saved.profile && typeof saved.profile === "object"
+          ? {
+              displayName: String(saved.profile.displayName || ""),
+              department: String(saved.profile.department || "")
+            }
+          : state.profile;
+      } catch (error) {
+        console.warn("Session storage is unavailable:", error);
+      }
+    }
+
+    function restartQuiz() {
+      try {
+        sessionStorage.removeItem(APP_CONFIG.storageKey);
+      } catch (error) {
+        console.warn("Session storage is unavailable:", error);
+      }
+      state.currentIndex = 0;
+      state.answers = {};
+      state.profile = { displayName: "", department: "" };
+      state.result = null;
+      state.resultImageBlob = null;
+      state.resultImageFileName = "";
+      els.saveImageButton.disabled = true;
+      els.saveImageButton.removeAttribute("aria-busy");
+      els.saveImageLabel.textContent = getUi().preparingImage;
+      els.displayName.value = "";
+      els.department.value = "";
+      showScreen("intro");
+      els.displayName.focus({ preventScroll: true });
+    }
+
+    init();
+  </script>
+</body>
+</html>
