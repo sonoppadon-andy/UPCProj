@@ -6,6 +6,7 @@
 <title>UPC Project</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root{
     --bg: #12161c;
@@ -318,12 +319,12 @@
       <h2 class="section-title">บันทึกระยะทาง</h2>
       <div class="card">
         <div class="field">
-          <label for="log-name">ชื่อของคุณ</label>
-          <select id="log-name"><option value="">-- เลือกชื่อ --</option></select>
+          <label for="log-team">ทีมของคุณ</label>
+          <select id="log-team"><option value="">-- เลือกทีม --</option></select>
         </div>
         <div class="field">
-          <label>ทีมของฉัน</label>
-          <div class="readonly-field" id="log-team-display">เลือกชื่อก่อนเพื่อดูทีม</div>
+          <label for="log-name">ชื่อของคุณ</label>
+          <select id="log-name" disabled><option value="">-- เลือกทีมก่อน --</option></select>
         </div>
         <div class="field">
           <label for="log-distance">ระยะทาง</label>
@@ -355,8 +356,12 @@
     <section class="view" id="view-history">
       <h2 class="section-title">ประวัติของฉัน</h2>
       <div class="field">
+        <label for="hist-team">ทีมของคุณ</label>
+        <select id="hist-team"><option value="">-- เลือกทีม --</option></select>
+      </div>
+      <div class="field">
         <label for="hist-select">ฉันคือใคร</label>
-        <select id="hist-select"><option value="">-- เลือกชื่อ --</option></select>
+        <select id="hist-select" disabled><option value="">-- เลือกทีมก่อน --</option></select>
       </div>
       <div id="history-list"></div>
     </section>
@@ -383,6 +388,15 @@
 
         <div class="admin-panel active" id="admin-panel-records">
           <h2 class="section-title">จัดการรายการทั้งหมด</h2>
+
+          <div class="admin-search-bar" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+            <select id="admin-search-team" style="flex:1; min-width:140px;"><option value="">-- ทุกทีม --</option></select>
+            <select id="admin-search-name" style="flex:1; min-width:140px;" disabled><option value="">-- เลือกทีมก่อน --</option></select>
+            <input type="date" id="admin-search-date" style="flex:1; min-width:140px;">
+            <button id="admin-search-clear" class="secondary-btn" type="button">ล้างตัวกรอง</button>
+          </div>
+          <p class="note" id="admin-search-count" style="margin-top:0;"></p>
+
           <div style="overflow-x:auto;">
             <table id="admin-table">
               <thead><tr><th>รูป</th><th>ชื่อ</th><th>ทีม</th><th>KM</th><th>วันที่</th><th></th></tr></thead>
@@ -430,7 +444,18 @@
                 <button class="primary" id="team-photo-save" disabled>บันทึกรูปทีม</button>
                 <button class="secondary-btn danger" id="team-photo-delete" disabled>ลบรูปทีม</button>
               </div>
-              <p class="note">แนะนำรูปสี่เหลี่ยมจัตุรัส เช่น 800 × 800 px ระบบจะย่อรูปก่อนอัปโหลดไป Google Drive</p>
+              <p class="note">แนะนำรูปสี่เหลี่ยมจัตุรัส เช่น 800 × 800 px ระบบจะย่อรูปก่อนอัปโหลดไป Supabase Storage</p>
+            </div>
+
+            <div style="margin-top:18px; padding-bottom:18px; border-bottom:1px solid var(--line);">
+              <label style="display:block; margin-bottom:8px; font-weight:600;">ทีมทั้งหมด</label>
+              <p class="note" style="margin-top:0;">ลบทีมจะทำให้สมาชิกในทีมนั้นกลายเป็น "ยังไม่ได้กำหนดทีม" และลบรูปประจำทีมด้วย</p>
+              <div style="overflow-x:auto;">
+                <table id="team-list-table">
+                  <thead><tr><th>ทีม</th><th>จำนวนสมาชิก</th><th></th></tr></thead>
+                  <tbody id="team-list-tbody"></tbody>
+                </table>
+              </div>
             </div>
 
             <div style="overflow-x:auto; margin-top:18px;">
@@ -462,41 +487,154 @@
 <script>
 const ADMIN_PASSWORD = "adMIN$123";
 
-// ใส่ URL ที่ได้จากการ Deploy Google Apps Script เป็น Web app
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbv3d3lI82BucPW7Y5m_UkagXQZOh2wRUJ21yZfONIXj2kn6hT_686a7F8-bm25pqw/exec";
+// ---------- Supabase connection ----------
+const SUPABASE_URL = "https://ljrdbnexhwrlraqoouzk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqcmRibmV4aHdybHJhcW9vdXprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMzI3MTQsImV4cCI6MjEwMjYwODcxNH0.w2sjFGWWqHpJWbDxLEom58ZbU51J5VKn7lPPTexGAwo";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const RUN_PHOTO_BUCKET = 'run-photos';
+const TEAM_PHOTO_BUCKET = 'team-photos';
 
 let runs = [];
-let memberPasswords = {};
+// เก็บแค่ true/false ว่าใครตั้งรหัสผ่านไว้แล้วบ้าง — ไม่เก็บค่ารหัสผ่านจริงในฝั่ง client อีกต่อไป
+// การตรวจสอบรหัสผ่านจริงทำผ่าน RPC function บน Supabase (verify_member_password) เท่านั้น
+let memberHasPassword = {};
 let memberTeams = {};
 let teamPhotos = {};
 let loaded = false;
 
-async function apiRequest(action, payload = {}){
-  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('PASTE_YOUR')){
-    throw new Error('ยังไม่ได้กำหนด GOOGLE_SCRIPT_URL');
-  }
-  const response = await fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-    body: JSON.stringify({action, ...payload})
+// id lookup caches so the rest of the app can keep working with plain names,
+// while the database itself uses uuid foreign keys under the hood
+let teamIdByName = {};   // { "ชื่อทีม": uuid }
+let memberIdByName = {}; // { "ชื่อ": uuid }
+
+function logSupabaseError(context, e){
+  const detail = {
+    message: e?.message || String(e),
+    details: e?.details || null,
+    hint: e?.hint || null,
+    code: e?.code || null,
+    status: e?.status || null
+  };
+  const line = context + ' error -> message: ' + detail.message +
+    ' | details: ' + detail.details +
+    ' | hint: ' + detail.hint +
+    ' | code: ' + detail.code +
+    ' | status: ' + detail.status;
+  console.error(line);
+  return detail.message || detail.details || detail.hint || 'ไม่ทราบสาเหตุ (ดู console)';
+}
+
+function dataUrlToBlob(dataUrl){
+  const [meta, b64] = dataUrl.split(',');
+  const mime = meta.match(/data:(.*);base64/)[1];
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
+}
+
+async function uploadPhoto(bucket, path, dataUrl){
+  const blob = dataUrlToBlob(dataUrl);
+  const ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg','jpg');
+  const fullPath = `${path}-${Date.now()}.${ext}`;
+  const { error } = await sb.storage.from(bucket).upload(fullPath, blob, {
+    contentType: blob.type,
+    upsert: true
   });
-  if(!response.ok) throw new Error(`HTTP ${response.status}`);
-  const result = await response.json();
-  if(!result.ok) throw new Error(result.error || 'Google Sheets API error');
-  return result.data;
+  if(error) throw error;
+  const { data } = sb.storage.from(bucket).getPublicUrl(fullPath);
+  return data.publicUrl;
+}
+
+// หา team_id จากชื่อทีม สร้างใหม่ให้ถ้ายังไม่มี
+async function ensureTeamId(teamName){
+  const clean = (teamName || '').trim();
+  if(!clean) return null;
+  if(teamIdByName[clean]) return teamIdByName[clean];
+  const { data: existing, error: findErr } = await sb.from('teams').select('id').eq('name', clean).maybeSingle();
+  if(findErr) throw findErr;
+  if(existing){ teamIdByName[clean] = existing.id; return existing.id; }
+  const { data: created, error: createErr } = await sb.from('teams').insert({name: clean}).select('id').single();
+  if(createErr) throw createErr;
+  teamIdByName[clean] = created.id;
+  return created.id;
+}
+
+// หา member_id จากชื่อ สร้างใหม่ให้ถ้ายังไม่มี
+async function ensureMemberId(name){
+  const clean = (name || '').trim();
+  if(!clean) return null;
+  if(memberIdByName[clean]) return memberIdByName[clean];
+  const { data: existing, error: findErr } = await sb.from('members').select('id').eq('name', clean).maybeSingle();
+  if(findErr) throw findErr;
+  if(existing){ memberIdByName[clean] = existing.id; return existing.id; }
+  const { data: created, error: createErr } = await sb.from('members').insert({name: clean}).select('id').single();
+  if(createErr) throw createErr;
+  memberIdByName[clean] = created.id;
+  return created.id;
 }
 
 async function loadPasswords(){
   // ข้อมูลถูกโหลดพร้อมกันจาก loadAll() แล้ว
 }
-async function savePasswords(){
+
+// ตั้ง/เปลี่ยนรหัสผ่านของสมาชิกคนเดียว (เขียนตรงไปที่แถวนั้น ไม่ต้องโหลดรหัสคนอื่นมาก่อน)
+// หมายเหตุความปลอดภัย: ตอนนี้ยังเก็บรหัสผ่านเป็น plaintext ใน password_hash
+// เพื่อความคงเดิม (parity) กับระบบเก่า แนะนำให้ทำ hashing ในขั้นถัดไป
+async function setMemberPassword(name, pass){
   try{
-    await apiRequest('savePasswords', {passwords: memberPasswords});
+    const id = await ensureMemberId(name);
+    const { error } = await sb.from('members').update({password_hash: pass}).eq('id', id);
+    if(error) throw error;
+    memberHasPassword[name] = true;
     return true;
   }catch(e){
-    console.error(e);
-    showToast('บันทึกรหัสผ่านไม่สำเร็จ', true);
+    const msg = logSupabaseError('setMemberPassword', e);
+    showToast('บันทึกรหัสผ่านไม่สำเร็จ: ' + msg, true);
     return false;
+  }
+}
+
+// ลบรหัสผ่านของสมาชิกคนเดียว
+async function clearMemberPassword(name){
+  try{
+    const id = await ensureMemberId(name);
+    const { error } = await sb.from('members').update({password_hash: null}).eq('id', id);
+    if(error) throw error;
+    delete memberHasPassword[name];
+    return true;
+  }catch(e){
+    const msg = logSupabaseError('clearMemberPassword', e);
+    showToast('ลบรหัสผ่านไม่สำเร็จ: ' + msg, true);
+    return false;
+  }
+}
+
+// ตรวจสอบรหัสผ่านผ่าน RPC function บน Supabase (verify_member_password)
+// ไม่มีการส่งค่ารหัสผ่านจริงของใครกลับมาที่ client เลย ได้แค่ true/false
+// throw ออกไปถ้าเรียก RPC ไม่สำเร็จ เพื่อไม่ให้ปนกับกรณี "รหัสผ่านผิดจริงๆ"
+async function verifyMemberPassword(name, password){
+  const { data, error } = await sb.rpc('verify_member_password', {
+    p_name: name,
+    p_password: password
+  });
+  if(error) throw error;
+  return !!data;
+}
+
+// โหลดสถานะว่าใครตั้งรหัสผ่านไว้แล้วบ้าง (true/false เท่านั้น ไม่มีรหัสผ่านจริงติดมาด้วย)
+async function loadPasswordStatus(){
+  try{
+    const { data, error } = await sb.rpc('list_password_status');
+    if(error) throw error;
+    memberHasPassword = {};
+    (data || []).forEach(row=>{
+      if(row.has_password) memberHasPassword[row.member_name] = true;
+    });
+  }catch(e){
+    logSupabaseError('loadPasswordStatus', e);
+    memberHasPassword = {};
   }
 }
 
@@ -505,74 +643,176 @@ async function loadTeams(){
 }
 async function saveTeams(){
   try{
-    await apiRequest('saveTeams', {teams: memberTeams});
+    for(const [name, team] of Object.entries(memberTeams)){
+      const memberId = await ensureMemberId(name);
+      const teamId = await ensureTeamId(team);
+      const { error } = await sb.from('members').update({team_id: teamId}).eq('id', memberId);
+      if(error) throw error;
+    }
     return true;
   }catch(e){
-    console.error(e);
-    showToast('บันทึกทีมไม่สำเร็จ', true);
+    const msg = logSupabaseError('saveTeams', e);
+    showToast('บันทึกทีมไม่สำเร็จ: ' + msg, true);
     return false;
   }
 }
 
 async function saveTeamPhoto(team, photo){
   try{
-    const url = await apiRequest('saveTeamPhoto', {team, photo});
+    const teamId = await ensureTeamId(team);
+    const url = await uploadPhoto(TEAM_PHOTO_BUCKET, `team-${teamId}`, photo);
+    const { error } = await sb.from('teams').update({photo_url: url}).eq('id', teamId);
+    if(error) throw error;
     teamPhotos[team] = url;
     return true;
   }catch(e){
-    console.error(e);
-    showToast('บันทึกรูปทีมไม่สำเร็จ', true);
+    const msg = logSupabaseError('saveTeamPhoto', e);
+    showToast('บันทึกรูปทีมไม่สำเร็จ: ' + msg, true);
     return false;
   }
 }
 
 async function deleteTeamPhoto(team){
   try{
-    await apiRequest('deleteTeamPhoto', {team});
+    const teamId = await ensureTeamId(team);
+    const { error } = await sb.from('teams').update({photo_url: null}).eq('id', teamId);
+    if(error) throw error;
     delete teamPhotos[team];
     return true;
   }catch(e){
-    console.error(e);
-    showToast('ลบรูปทีมไม่สำเร็จ', true);
+    const msg = logSupabaseError('deleteTeamPhoto', e);
+    showToast('ลบรูปทีมไม่สำเร็จ: ' + msg, true);
     return false;
   }
 }
 
-// ---------- Google Sheets Storage ----------
+// ลบทีมทั้งหมด: เอาสมาชิกในทีมนี้ออก (กลายเป็นยังไม่ได้กำหนดทีม) แล้วลบแถวทีมออกจากฐานข้อมูล
+async function deleteTeam(teamName){
+  try{
+    const teamId = teamIdByName[teamName];
+    if(!teamId){
+      // ทีมนี้มีแค่ฝั่ง client (ยังไม่เคยถูกบันทึกลง Supabase) ก็แค่ล้างออกจาก state
+      Object.keys(memberTeams).forEach(n=>{ if(memberTeams[n] === teamName) delete memberTeams[n]; });
+      delete teamPhotos[teamName];
+      return true;
+    }
+    const { error: unassignErr } = await sb.from('members').update({team_id: null}).eq('team_id', teamId);
+    if(unassignErr) throw unassignErr;
+    const { error: delErr } = await sb.from('teams').delete().eq('id', teamId);
+    if(delErr) throw delErr;
+
+    delete teamIdByName[teamName];
+    delete teamPhotos[teamName];
+    Object.keys(memberTeams).forEach(n=>{ if(memberTeams[n] === teamName) delete memberTeams[n]; });
+    return true;
+  }catch(e){
+    const msg = logSupabaseError('deleteTeam', e);
+    showToast('ลบทีมไม่สำเร็จ: ' + msg, true);
+    return false;
+  }
+}
+
+// ---------- Supabase Storage ----------
 async function migrateOldData(){
-  // ไม่ต้อง migrate window.storage เมื่อใช้ Google Sheets
+  // ไม่ต้อง migrate window.storage เมื่อใช้ Supabase
 }
 
 async function loadRuns(){
   try{
-    const data = await apiRequest('loadAll');
-    runs = Array.isArray(data.runs) ? data.runs : [];
-    memberPasswords = data.passwords || {};
-    memberTeams = data.teams || {};
-    teamPhotos = data.teamPhotos || {};
+    const [{data: teamsData, error: teamsErr},
+           {data: membersData, error: membersErr},
+           {data: runsData, error: runsErr}] = await Promise.all([
+      sb.from('teams').select('id,name,photo_url'),
+      sb.from('members').select('id,name,team_id'),
+      sb.from('runs').select('id,member_id,distance,run_date,photo_url,created_at')
+    ]);
+    if(teamsErr) throw teamsErr;
+    if(membersErr) throw membersErr;
+    if(runsErr) throw runsErr;
+
+    teamIdByName = {}; memberIdByName = {};
+    const teamNameById = {};
+    teamPhotos = {};
+    (teamsData || []).forEach(t=>{
+      teamIdByName[t.name] = t.id;
+      teamNameById[t.id] = t.name;
+      if(t.photo_url) teamPhotos[t.name] = t.photo_url;
+    });
+
+    const memberNameById = {};
+    memberTeams = {};
+    (membersData || []).forEach(m=>{
+      memberIdByName[m.name] = m.id;
+      memberNameById[m.id] = m.name;
+      if(m.team_id && teamNameById[m.team_id]) memberTeams[m.name] = teamNameById[m.team_id];
+    });
+
+    runs = (runsData || []).map(r=>({
+      id: r.id,
+      name: memberNameById[r.member_id] || '(ไม่พบชื่อ)',
+      distance: r.distance,
+      date: r.run_date,
+      photo: r.photo_url,
+      ts: new Date(r.created_at).getTime()
+    }));
+
+    // สถานะรหัสผ่าน (true/false เท่านั้น) โหลดแยกผ่าน RPC ไม่ปนกับ query ด้านบน
+    await loadPasswordStatus();
   }catch(e){
-    console.error(e);
+    const msg = logSupabaseError('loadRuns', e);
     runs = [];
-    memberPasswords = {};
+    memberHasPassword = {};
     memberTeams = {};
     teamPhotos = {};
-    showToast('โหลดข้อมูลจาก Google Sheets ไม่สำเร็จ', true);
+    showToast('โหลดข้อมูลจาก Supabase ไม่สำเร็จ: ' + msg, true);
   }
   loaded = true;
 }
 
-// บันทึกรายการทั้งหมดของสมาชิกคนนั้นกลับไปยัง Google Sheets
-// รูปที่เป็น Base64 จะถูก Apps Script อัปโหลดไป Google Drive แล้วเก็บ URL ในชีต
+// บันทึกรายการทั้งหมดของสมาชิกคนนั้นกลับไปยัง Supabase
+// รูปที่เป็น Base64 จะถูกอัปโหลดไป Supabase Storage แล้วเก็บ URL ไว้ในตาราง runs
 async function savePersonRuns(name){
   const mine = runs.filter(r => r.name === name);
   try{
-    const saved = await apiRequest('replacePersonRuns', {name, runs: mine});
-    // รับข้อมูลกลับมาเพื่อแทน Base64 ด้วย URL รูปจาก Google Drive
-    runs = runs.filter(r => r.name !== name).concat(saved || []);
+    const memberId = await ensureMemberId(name);
+
+    // ลบของเดิมทั้งหมดของคนนี้ แล้วค่อย insert ชุดใหม่ทั้งหมดแทน (เหมือน replacePersonRuns เดิม)
+    const { error: delErr } = await sb.from('runs').delete().eq('member_id', memberId);
+    if(delErr) throw delErr;
+
+    const rowsToInsert = [];
+    for(const r of mine){
+      let photoUrl = r.photo;
+      if(photoUrl && photoUrl.startsWith('data:')){
+        photoUrl = await uploadPhoto(RUN_PHOTO_BUCKET, `run-${memberId}`, photoUrl);
+      }
+      rowsToInsert.push({
+        member_id: memberId,
+        distance: r.distance,
+        run_date: r.date,
+        photo_url: photoUrl || null
+      });
+    }
+
+    let saved = [];
+    if(rowsToInsert.length){
+      const { data, error: insErr } = await sb.from('runs').insert(rowsToInsert).select('id,member_id,distance,run_date,photo_url,created_at');
+      if(insErr) throw insErr;
+      saved = (data || []).map(r=>({
+        id: r.id,
+        name,
+        distance: r.distance,
+        date: r.run_date,
+        photo: r.photo_url,
+        ts: new Date(r.created_at).getTime()
+      }));
+    }
+
+    runs = runs.filter(r => r.name !== name).concat(saved);
     return true;
   }catch(e){
-    console.error(e);
-    showToast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง', true);
+    const msg = logSupabaseError('savePersonRuns', e);
+    showToast('บันทึกไม่สำเร็จ: ' + msg, true);
     return false;
   }
 }
@@ -714,50 +954,109 @@ function getAllKnownNames(){
   return [...new Set([
     ...runs.map(r=>r.name),
     ...Object.keys(memberTeams),
-    ...Object.keys(memberPasswords)
+    ...Object.keys(memberHasPassword)
   ].map(n=>(n||'').trim()).filter(Boolean))].sort();
 }
 
+function getMembersInTeam(team){
+  const names = getAllKnownNames();
+  if(team === NO_TEAM){
+    return names.filter(n => !memberTeams[n] || !memberTeams[n].trim());
+  }
+  return names.filter(n => (memberTeams[n] || '').trim() === team);
+}
+
+// เติมรายชื่อใน dropdown "ชื่อของคุณ" ตามทีมที่เลือกไว้ใน dropdown "ทีมของคุณ"
+function renderLogNameOptions(){
+  const teamSel = document.getElementById('log-team');
+  const nameSel = document.getElementById('log-name');
+  const team = teamSel.value;
+  const currentName = nameSel.value;
+
+  if(!team){
+    nameSel.innerHTML = '<option value="">-- เลือกทีมก่อน --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  const members = getMembersInTeam(team);
+  if(members.length === 0){
+    nameSel.innerHTML = '<option value="">-- ไม่มีสมาชิกในทีมนี้ --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  nameSel.disabled = false;
+  nameSel.innerHTML = '<option value="">-- เลือกชื่อ --</option>' +
+    members.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  if(members.includes(currentName)) nameSel.value = currentName;
+}
+document.getElementById('log-team').addEventListener('change', renderLogNameOptions);
+
+// เติมรายชื่อใน dropdown "ฉันคือใคร" (History) ตามทีมที่เลือกไว้ใน dropdown "ทีมของคุณ"
+function renderHistNameOptions(){
+  const teamSel = document.getElementById('hist-team');
+  const nameSel = document.getElementById('hist-select');
+  const team = teamSel.value;
+  const currentName = nameSel.value;
+
+  if(!team){
+    nameSel.innerHTML = '<option value="">-- เลือกทีมก่อน --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  const members = getMembersInTeam(team);
+  if(members.length === 0){
+    nameSel.innerHTML = '<option value="">-- ไม่มีสมาชิกในทีมนี้ --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  nameSel.disabled = false;
+  nameSel.innerHTML = '<option value="">-- เลือกชื่อ --</option>' +
+    members.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  if(members.includes(currentName)) nameSel.value = currentName;
+}
+document.getElementById('hist-team').addEventListener('change', ()=>{
+  renderHistNameOptions();
+  renderHistory();
+});
+
 function renderNameLists(){
   const names = getAllKnownNames();
+  const knownTeams = getKnownTeams();
+  const hasUnassigned = names.some(n => !memberTeams[n] || !memberTeams[n].trim());
+  const teamOptions = hasUnassigned ? [...knownTeams, NO_TEAM] : [...knownTeams];
 
-  const logSel = document.getElementById('log-name');
-  const logCurrent = logSel.value;
-  logSel.innerHTML = '<option value="">-- เลือกชื่อ --</option>' + names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-  if(names.includes(logCurrent)) logSel.value = logCurrent;
+  // เมนู "บันทึกระยะทาง": เลือกทีมก่อน แล้วชื่อจะกรองตามทีมนั้น
+  const logTeamSel = document.getElementById('log-team');
+  const logTeamCurrent = logTeamSel.value;
+  logTeamSel.innerHTML = '<option value="">-- เลือกทีม --</option>' +
+    teamOptions.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if(teamOptions.includes(logTeamCurrent)) logTeamSel.value = logTeamCurrent;
+  renderLogNameOptions();
 
-  const sel = document.getElementById('hist-select');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">-- เลือกชื่อ --</option>' + names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-  if(names.includes(current)) sel.value = current;
+  // เมนู "ประวัติของฉัน": เลือกทีมก่อน แล้วชื่อจะกรองตามทีมนั้น
+  const histTeamSel = document.getElementById('hist-team');
+  const histTeamCurrent = histTeamSel.value;
+  histTeamSel.innerHTML = '<option value="">-- เลือกทีม --</option>' +
+    teamOptions.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if(teamOptions.includes(histTeamCurrent)) histTeamSel.value = histTeamCurrent;
+  renderHistNameOptions();
 
   const teams = [...new Set(Object.values(memberTeams).map(t=>(t||'').trim()).filter(Boolean))].sort();
   document.getElementById('team-list').innerHTML = teams.map(t=>`<option value="${escapeHtml(t)}">`).join('');
-}
 
-function updateLogTeamDisplay(){
-  const name = document.getElementById('log-name').value.trim();
-  const el = document.getElementById('log-team-display');
-  if(!name){
-    el.textContent = 'เลือกชื่อก่อนเพื่อดูทีม';
-    el.classList.remove('assigned');
-    return;
-  }
-  const team = memberTeams[name];
-  if(team){
-    el.textContent = team;
-    el.classList.add('assigned');
-  }else{
-    el.textContent = 'ยังไม่ได้กำหนดทีม (ติดต่อ Admin)';
-    el.classList.remove('assigned');
-  }
+  renderAdminSearchTeamOptions();
+  renderAdminSearchNameOptions();
 }
-document.getElementById('log-name').addEventListener('change', updateLogTeamDisplay);
 
 // ---------- Render: History ----------
 function renderHistory(){
+  const team = document.getElementById('hist-team').value;
   const name = document.getElementById('hist-select').value;
   const listEl = document.getElementById('history-list');
+  if(!team){
+    listEl.innerHTML = `<div class="empty">เลือกทีมของคุณด้านบนก่อน</div>`;
+    return;
+  }
   if(!name){
     listEl.innerHTML = `<div class="empty">เลือกชื่อของคุณด้านบนเพื่อดูประวัติการวิ่ง</div>`;
     return;
@@ -796,36 +1095,52 @@ document.getElementById('photo-modal').addEventListener('click', ()=>{
 // ---------- Log Run ----------
 let pendingPhoto = null;
 
-document.getElementById('log-photo').addEventListener('change', async (e)=>{
+async function handleLogPhotoChange(e){
   const file = e.target.files[0];
   if(!file) return;
   document.getElementById('photo-drop-label').textContent = 'กำลังประมวลผลรูป...';
   try{
     pendingPhoto = await compressImage(file);
     document.getElementById('photo-drop').innerHTML = `<img src="${pendingPhoto}"><input type="file" accept="image/*" id="log-photo">`;
-    document.getElementById('log-photo').addEventListener('change', arguments.callee);
+    document.getElementById('log-photo').addEventListener('change', handleLogPhotoChange);
   }catch(err){
+    console.error('compressImage error:', err);
     showToast('อ่านรูปไม่สำเร็จ', true);
   }
-});
+}
+document.getElementById('log-photo').addEventListener('change', handleLogPhotoChange);
 
 document.getElementById('log-date').value = todayStr();
 
 document.getElementById('log-submit').addEventListener('click', async ()=>{
+  const team = document.getElementById('log-team').value;
   const name = document.getElementById('log-name').value.trim();
   const password = document.getElementById('log-password').value;
-  const team = (memberTeams[name] && memberTeams[name].trim()) || NO_TEAM;
   const distance = parseFloat(document.getElementById('log-distance').value);
   const date = document.getElementById('log-date').value || todayStr();
   const btn = document.getElementById('log-submit');
 
-  if(!name){ showToast('กรุณาใส่ชื่อของคุณ', true); return; }
-  if(memberPasswords[name] && password !== memberPasswords[name]){
-    showToast('รหัสผ่านไม่ถูกต้อง', true); return;
-  }
+  if(!team){ showToast('กรุณาเลือกทีมของคุณ', true); return; }
+  if(!name){ showToast('กรุณาเลือกชื่อของคุณ', true); return; }
   if(!distance || distance <= 0){ showToast('กรุณาใส่ระยะทางที่ถูกต้อง', true); return; }
 
-  btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+  btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ...';
+  let passwordOk = false;
+  try{
+    passwordOk = await verifyMemberPassword(name, password);
+  }catch(e){
+    const msg = logSupabaseError('verifyMemberPassword', e);
+    btn.disabled = false; btn.textContent = 'บันทึก';
+    showToast('ตรวจสอบรหัสผ่านไม่สำเร็จ: ' + msg, true);
+    return;
+  }
+  if(!passwordOk){
+    btn.disabled = false; btn.textContent = 'บันทึก';
+    showToast('รหัสผ่านไม่ถูกต้อง', true);
+    return;
+  }
+
+  btn.textContent = 'กำลังบันทึก...';
   runs.push({ id: uid(), name, team, distance, date, photo: pendingPhoto || null, ts: Date.now() });
   const ok = await savePersonRuns(name);
   btn.disabled = false; btn.textContent = 'บันทึก';
@@ -835,7 +1150,7 @@ document.getElementById('log-submit').addEventListener('click', async ()=>{
     document.getElementById('log-distance').value = '';
     document.getElementById('log-name').value = '';
     document.getElementById('log-password').value = '';
-    updateLogTeamDisplay();
+    renderLogNameOptions();
     pendingPhoto = null;
     document.getElementById('photo-drop').innerHTML = `<span id="photo-drop-label">แตะเพื่ออัปโหลดรูป</span><input type="file" accept="image/*" id="log-photo">`;
     renderAll();
@@ -859,6 +1174,7 @@ function showAdminPanel(panelName){
   if(panelName === 'teams'){
     renderTeamManager();
     renderTeamPhotoManager();
+    renderTeamListManager();
   }
 }
 
@@ -876,6 +1192,7 @@ document.getElementById('admin-unlock').addEventListener('click', ()=>{
     renderPasswordManager();
     renderTeamManager();
     renderTeamPhotoManager();
+    renderTeamListManager();
   }else{
     showToast('รหัสผ่านไม่ถูกต้อง', true);
   }
@@ -887,13 +1204,74 @@ document.getElementById('admin-logout').addEventListener('click', ()=>{
   document.getElementById('admin-unlocked').style.display = 'none';
 });
 
+function renderAdminSearchTeamOptions(){
+  const sel = document.getElementById('admin-search-team');
+  const current = sel.value;
+  const names = getAllKnownNames();
+  const knownTeams = getKnownTeams();
+  const hasUnassigned = names.some(n => !memberTeams[n] || !memberTeams[n].trim());
+  const teamOptions = hasUnassigned ? [...knownTeams, NO_TEAM] : [...knownTeams];
+  sel.innerHTML = '<option value="">-- ทุกทีม --</option>' +
+    teamOptions.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if(teamOptions.includes(current)) sel.value = current;
+}
+
+// เติมรายชื่อในช่องค้นหา "ชื่อ" ตามทีมที่เลือกไว้ในช่องค้นหา "ทีม" ก่อน
+function renderAdminSearchNameOptions(){
+  const teamSel = document.getElementById('admin-search-team');
+  const nameSel = document.getElementById('admin-search-name');
+  const team = teamSel.value;
+  const currentName = nameSel.value;
+
+  if(!team){
+    nameSel.innerHTML = '<option value="">-- เลือกทีมก่อน --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  const members = getMembersInTeam(team);
+  if(members.length === 0){
+    nameSel.innerHTML = '<option value="">-- ไม่มีสมาชิกในทีมนี้ --</option>';
+    nameSel.disabled = true;
+    return;
+  }
+  nameSel.disabled = false;
+  nameSel.innerHTML = '<option value="">-- ทุกคนในทีมนี้ --</option>' +
+    members.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  if(members.includes(currentName)) nameSel.value = currentName;
+}
+
+function getFilteredAdminRuns(){
+  const teamQuery = document.getElementById('admin-search-team').value;
+  const nameQuery = document.getElementById('admin-search-name').value;
+  const dateQuery = document.getElementById('admin-search-date').value;
+
+  return runs.filter(r=>{
+    if(teamQuery && (memberTeams[r.name] || NO_TEAM) !== teamQuery) return false;
+    if(nameQuery && r.name !== nameQuery) return false;
+    if(dateQuery && r.date !== dateQuery) return false;
+    return true;
+  });
+}
+
 function renderAdminTable(){
   const tbody = document.getElementById('admin-tbody');
+  const countEl = document.getElementById('admin-search-count');
+  const filtered = getFilteredAdminRuns();
+  const hasFilter = document.getElementById('admin-search-name').value ||
+                     document.getElementById('admin-search-team').value ||
+                     document.getElementById('admin-search-date').value;
+
+  countEl.textContent = hasFilter ? `พบ ${filtered.length} จาก ${runs.length} รายการ` : '';
+
   if(runs.length === 0){
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">ยังไม่มีรายการ</td></tr>`;
     return;
   }
-  const sorted = [...runs].sort((a,b)=> b.ts - a.ts);
+  if(filtered.length === 0){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">ไม่พบรายการที่ตรงกับตัวกรอง</td></tr>`;
+    return;
+  }
+  const sorted = [...filtered].sort((a,b)=> b.ts - a.ts);
   tbody.innerHTML = sorted.map(r=>{
     const photo = r.photo ? `<img src="${r.photo}" data-view-photo="${r.id}">` : '—';
     return `<tr data-id="${r.id}">
@@ -933,6 +1311,19 @@ function renderAdminTable(){
     });
   });
 }
+
+document.getElementById('admin-search-team').addEventListener('change', ()=>{
+  renderAdminSearchNameOptions();
+  renderAdminTable();
+});
+document.getElementById('admin-search-name').addEventListener('change', renderAdminTable);
+document.getElementById('admin-search-date').addEventListener('change', renderAdminTable);
+document.getElementById('admin-search-clear').addEventListener('click', ()=>{
+  document.getElementById('admin-search-team').value = '';
+  document.getElementById('admin-search-date').value = '';
+  renderAdminSearchNameOptions();
+  renderAdminTable();
+});
 
 function startEditRow(tr){
   const id = tr.dataset.id;
@@ -978,14 +1369,14 @@ function startEditRow(tr){
 
 function renderPasswordManager(){
   const tbody = document.getElementById('pw-tbody');
-  const names = new Set([...Object.keys(memberPasswords), ...runs.map(r=>r.name)]);
+  const names = new Set([...Object.keys(memberHasPassword), ...runs.map(r=>r.name)]);
   const sorted = [...names].sort();
   if(sorted.length === 0){
     tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted); padding:16px;">ยังไม่มีสมาชิก</td></tr>`;
     return;
   }
   tbody.innerHTML = sorted.map(name=>{
-    const hasPass = !!memberPasswords[name];
+    const hasPass = !!memberHasPassword[name];
     return `<tr data-name="${escapeHtml(name)}">
       <td>${escapeHtml(name)}</td>
       <td class="pw-cell">${hasPass ? '••••••' : '<span style="color:var(--muted); font-size:12px;">ยังไม่ได้ตั้ง</span>'}</td>
@@ -1009,8 +1400,7 @@ function renderPasswordManager(){
       actions.querySelector('.save').addEventListener('click', async ()=>{
         const val = cell.querySelector('input').value.trim();
         if(!val){ showToast('กรุณาใส่รหัสผ่าน', true); return; }
-        memberPasswords[name] = val;
-        const ok = await savePasswords();
+        const ok = await setMemberPassword(name, val);
         if(ok) showToast(`ตั้งรหัสผ่านให้ ${name} แล้ว`);
         renderPasswordManager();
       });
@@ -1022,8 +1412,7 @@ function renderPasswordManager(){
       const tr = e.target.closest('tr');
       const name = tr.dataset.name;
       if(!confirm(`ลบรหัสผ่านของ ${name} ใช่ไหม?`)) return;
-      delete memberPasswords[name];
-      const ok = await savePasswords();
+      const ok = await clearMemberPassword(name);
       if(ok) showToast('ลบรหัสผ่านแล้ว');
       renderPasswordManager();
     });
@@ -1034,8 +1423,7 @@ document.getElementById('pw-add-btn').addEventListener('click', async ()=>{
   const name = document.getElementById('pw-new-name').value.trim();
   const pass = document.getElementById('pw-new-pass').value.trim();
   if(!name || !pass){ showToast('กรอกชื่อและรหัสผ่านให้ครบ', true); return; }
-  memberPasswords[name] = pass;
-  const ok = await savePasswords();
+  const ok = await setMemberPassword(name, pass);
   if(ok){
     showToast(`ตั้งรหัสผ่านให้ ${name} แล้ว`);
     document.getElementById('pw-new-name').value = '';
@@ -1148,6 +1536,44 @@ document.getElementById('team-photo-delete').addEventListener('click', async ()=
   }
 });
 
+function renderTeamListManager(){
+  const tbody = document.getElementById('team-list-tbody');
+  const teams = getKnownTeams();
+  if(teams.length === 0){
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted); padding:16px;">ยังไม่มีทีม</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = teams.map(team=>{
+    const count = Object.values(memberTeams).filter(t=>t===team).length;
+    return `<tr data-team="${escapeHtml(team)}">
+      <td>${escapeHtml(team)}</td>
+      <td>${count} คน</td>
+      <td><button class="secondary-btn danger team-delete">ลบทีม</button></td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('.team-delete').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const tr = e.target.closest('tr');
+      const team = tr.dataset.team;
+      const count = Object.values(memberTeams).filter(t=>t===team).length;
+      const msg = count > 0
+        ? `ลบทีม "${team}" ใช่ไหม? สมาชิก ${count} คนในทีมนี้จะกลายเป็น "ยังไม่ได้กำหนดทีม" และรูปประจำทีมจะถูกลบด้วย`
+        : `ลบทีม "${team}" ใช่ไหม?`;
+      if(!confirm(msg)) return;
+
+      btn.disabled = true; btn.textContent = 'กำลังลบ...';
+      const ok = await deleteTeam(team);
+      if(ok) showToast(`ลบทีม "${team}" แล้ว`);
+      renderTeamListManager();
+      renderTeamManager();
+      renderTeamPhotoManager();
+      renderNameLists();
+      renderAll();
+    });
+  });
+}
+
 function renderTeamManager(){
   const tbody = document.getElementById('team-tbody');
   const names = new Set([...Object.keys(memberTeams), ...runs.map(r=>r.name)]);
@@ -1227,7 +1653,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.view).classList.add('active');
     if(btn.dataset.view === 'history') renderHistory();
-    if(btn.dataset.view === 'admin' && adminUnlocked){ showAdminPanel('records'); renderPasswordManager(); renderTeamManager(); renderTeamPhotoManager(); }
+    if(btn.dataset.view === 'admin' && adminUnlocked){ showAdminPanel('records'); renderPasswordManager(); renderTeamManager(); renderTeamPhotoManager(); renderTeamListManager(); }
   });
 });
 document.getElementById('hist-select').addEventListener('change', renderHistory);
@@ -1236,9 +1662,8 @@ document.getElementById('hist-select').addEventListener('change', renderHistory)
 function renderAll(){
   renderLeaderboard();
   renderNameLists();
-  updateLogTeamDisplay();
   if(document.getElementById('view-history').classList.contains('active')) renderHistory();
-  if(adminUnlocked){ renderAdminTable(); renderPasswordManager(); renderTeamManager(); renderTeamPhotoManager(); }
+  if(adminUnlocked){ renderAdminTable(); renderPasswordManager(); renderTeamManager(); renderTeamPhotoManager(); renderTeamListManager(); }
 }
 
 (async function init(){
