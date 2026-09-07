@@ -717,18 +717,29 @@ async function migrateOldData(){
   // ไม่ต้อง migrate window.storage เมื่อใช้ Supabase
 }
 
+// Supabase/PostgREST จำกัดผลลัพธ์สูงสุด 1000 แถวต่อ request โดย default
+// ถ้าไม่ทำ pagination ข้อมูลที่เกิน 1000 แถวจะหายไปเงียบๆ (สาเหตุ Leaderboard ค้างที่ 1000)
+async function fetchAllRows(table, columns){
+  const PAGE_SIZE = 1000;
+  let all = [];
+  let from = 0;
+  while(true){
+    const { data, error } = await sb.from(table).select(columns).range(from, from + PAGE_SIZE - 1);
+    if(error) throw error;
+    all = all.concat(data || []);
+    if(!data || data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+  return all;
+}
+
 async function loadRuns(){
   try{
-    const [{data: teamsData, error: teamsErr},
-           {data: membersData, error: membersErr},
-           {data: runsData, error: runsErr}] = await Promise.all([
-      sb.from('teams').select('id,name,photo_url'),
-      sb.from('members').select('id,name,team_id'),
-      sb.from('runs').select('id,member_id,distance,run_date,photo_url,created_at')
+    const [teamsData, membersData, runsData] = await Promise.all([
+      fetchAllRows('teams', 'id,name,photo_url'),
+      fetchAllRows('members', 'id,name,team_id'),
+      fetchAllRows('runs', 'id,member_id,distance,run_date,photo_url,created_at')
     ]);
-    if(teamsErr) throw teamsErr;
-    if(membersErr) throw membersErr;
-    if(runsErr) throw runsErr;
 
     teamIdByName = {}; memberIdByName = {};
     const teamNameById = {};
@@ -769,50 +780,88 @@ async function loadRuns(){
   loaded = true;
 }
 
-// บันทึกรายการทั้งหมดของสมาชิกคนนั้นกลับไปยัง Supabase
-// รูปที่เป็น Base64 จะถูกอัปโหลดไป Supabase Storage แล้วเก็บ URL ไว้ในตาราง runs
-async function savePersonRuns(name){
-  const mine = runs.filter(r => r.name === name);
+// ---- บันทึกลง Supabase ทีละแถวด้วย id ตรงๆ (แทนวิธีเดิมที่ลบทั้งหมดของคนนั้นแล้ว insert ใหม่ทั้งหมด) ----
+// เดิม savePersonRuns() ลบทุก record ของคนนั้นแล้ว insert ใหม่ทั้งชุดทุกครั้งที่บันทึก/ลบ/แก้ 1 รายการ
+// ทำให้ (1) รูปที่เพิ่ง upload อาจถูกอัปโหลดซ้ำ/ค้างเมื่อบันทึกติดกันหลายครั้ง และ
+// (2) ถ้ามีการลบ/แก้ 2 รายการของคนเดียวกันใกล้ๆกัน คำสั่ง DELETE ทั้งหมดของอีกคำขอ
+// จะไปกวาด record ที่เพิ่ง insert จากคำขออื่นทิ้งไปด้วย (ลบเกินกว่าที่ผู้ใช้เลือก)
+// เปลี่ยนมาทำงานเฉพาะแถวเดียวด้วย id ตรงๆ จึงไม่มี race นี้อีกต่อไป
+
+// เพิ่มรายการวิ่งใหม่ 1 รายการ
+async function insertRun({name, distance, date, photo}){
   try{
     const memberId = await ensureMemberId(name);
+    let photoUrl = photo;
+    if(photoUrl && photoUrl.startsWith('data:')){
+      photoUrl = await uploadPhoto(RUN_PHOTO_BUCKET, `run-${memberId}`, photoUrl);
+    }
+    const { data, error } = await sb.from('runs').insert({
+      member_id: memberId,
+      distance,
+      run_date: date,
+      photo_url: photoUrl || null
+    }).select('id,member_id,distance,run_date,photo_url,created_at').single();
+    if(error) throw error;
+    runs.push({
+      id: data.id,
+      name,
+      distance: data.distance,
+      date: data.run_date,
+      photo: data.photo_url,
+      ts: new Date(data.created_at).getTime()
+    });
+    return true;
+  }catch(e){
+    const msg = logSupabaseError('insertRun', e);
+    showToast('บันทึกไม่สำเร็จ: ' + msg, true);
+    return false;
+  }
+}
 
-    // ลบของเดิมทั้งหมดของคนนี้ แล้วค่อย insert ชุดใหม่ทั้งหมดแทน (เหมือน replacePersonRuns เดิม)
-    const { error: delErr } = await sb.from('runs').delete().eq('member_id', memberId);
-    if(delErr) throw delErr;
+// ลบรายการวิ่ง 1 รายการด้วย id
+async function deleteRunRow(id){
+  try{
+    const { error } = await sb.from('runs').delete().eq('id', id);
+    if(error) throw error;
+    runs = runs.filter(r => r.id !== id);
+    return true;
+  }catch(e){
+    const msg = logSupabaseError('deleteRunRow', e);
+    showToast('ลบไม่สำเร็จ: ' + msg, true);
+    return false;
+  }
+}
 
-    const rowsToInsert = [];
-    for(const r of mine){
-      let photoUrl = r.photo;
+// แก้ไขรายการวิ่ง 1 รายการด้วย id (รวมถึงกรณีเปลี่ยนชื่อ/ย้ายไปคนละ member)
+async function updateRunRow(id, {name, distance, date, photo}){
+  try{
+    const memberId = await ensureMemberId(name);
+    const payload = { member_id: memberId, distance, run_date: date };
+    if(photo !== undefined){
+      let photoUrl = photo;
       if(photoUrl && photoUrl.startsWith('data:')){
         photoUrl = await uploadPhoto(RUN_PHOTO_BUCKET, `run-${memberId}`, photoUrl);
       }
-      rowsToInsert.push({
-        member_id: memberId,
-        distance: r.distance,
-        run_date: r.date,
-        photo_url: photoUrl || null
-      });
+      payload.photo_url = photoUrl || null;
     }
-
-    let saved = [];
-    if(rowsToInsert.length){
-      const { data, error: insErr } = await sb.from('runs').insert(rowsToInsert).select('id,member_id,distance,run_date,photo_url,created_at');
-      if(insErr) throw insErr;
-      saved = (data || []).map(r=>({
-        id: r.id,
+    const { data, error } = await sb.from('runs').update(payload).eq('id', id)
+      .select('id,member_id,distance,run_date,photo_url,created_at').single();
+    if(error) throw error;
+    const idx = runs.findIndex(r => r.id === id);
+    if(idx > -1){
+      runs[idx] = {
+        id: data.id,
         name,
-        distance: r.distance,
-        date: r.run_date,
-        photo: r.photo_url,
-        ts: new Date(r.created_at).getTime()
-      }));
+        distance: data.distance,
+        date: data.run_date,
+        photo: data.photo_url,
+        ts: new Date(data.created_at).getTime()
+      };
     }
-
-    runs = runs.filter(r => r.name !== name).concat(saved);
     return true;
   }catch(e){
-    const msg = logSupabaseError('savePersonRuns', e);
-    showToast('บันทึกไม่สำเร็จ: ' + msg, true);
+    const msg = logSupabaseError('updateRunRow', e);
+    showToast('อัปเดตไม่สำเร็จ: ' + msg, true);
     return false;
   }
 }
@@ -1094,13 +1143,29 @@ document.getElementById('photo-modal').addEventListener('click', ()=>{
 
 // ---------- Log Run ----------
 let pendingPhoto = null;
+// เพิ่มขึ้นทุกครั้งที่เลือกรูปใหม่ หรือบันทึกสำเร็จ ใช้กันผลลัพธ์ compressImage ที่ค้างมาจาก
+// การเลือกรูปครั้งก่อนหน้าไปทับ/ไปติดกับรายการถัดไปโดยไม่ตั้งใจ (สาเหตุ "รูปครั้งที่ 2 ค้าง")
+let logPhotoToken = 0;
+
+// รีเซ็ต drop-zone รูปกลับสู่สถานะเริ่มต้น พร้อมผูก event listener ใหม่เสมอ
+// (จุดบั๊กเดิม: หลังบันทึกสำเร็จมีการ reset innerHTML แต่ไม่ได้ผูก listener ใหม่ให้ input
+//  ทำให้เลือกรูปสำหรับรายการถัดไปไม่ทำงานเลย)
+function resetLogPhotoInput(){
+  document.getElementById('photo-drop').innerHTML =
+    `<span id="photo-drop-label">แตะเพื่ออัปโหลดรูป</span><input type="file" accept="image/*" id="log-photo">`;
+  document.getElementById('log-photo').addEventListener('change', handleLogPhotoChange);
+}
 
 async function handleLogPhotoChange(e){
   const file = e.target.files[0];
   if(!file) return;
-  document.getElementById('photo-drop-label').textContent = 'กำลังประมวลผลรูป...';
+  const myToken = ++logPhotoToken;
+  const label = document.getElementById('photo-drop-label');
+  if(label) label.textContent = 'กำลังประมวลผลรูป...';
   try{
-    pendingPhoto = await compressImage(file);
+    const compressed = await compressImage(file);
+    if(myToken !== logPhotoToken) return; // มีการเลือกรูปใหม่หรือบันทึกไปแล้วระหว่างรอ ไม่ต้องเอาผลเก่ามาใช้
+    pendingPhoto = compressed;
     document.getElementById('photo-drop').innerHTML = `<img src="${pendingPhoto}"><input type="file" accept="image/*" id="log-photo">`;
     document.getElementById('log-photo').addEventListener('change', handleLogPhotoChange);
   }catch(err){
@@ -1108,7 +1173,7 @@ async function handleLogPhotoChange(e){
     showToast('อ่านรูปไม่สำเร็จ', true);
   }
 }
-document.getElementById('log-photo').addEventListener('change', handleLogPhotoChange);
+resetLogPhotoInput();
 
 document.getElementById('log-date').value = todayStr();
 
@@ -1141,8 +1206,7 @@ document.getElementById('log-submit').addEventListener('click', async ()=>{
   }
 
   btn.textContent = 'กำลังบันทึก...';
-  runs.push({ id: uid(), name, team, distance, date, photo: pendingPhoto || null, ts: Date.now() });
-  const ok = await savePersonRuns(name);
+  const ok = await insertRun({ name, distance, date, photo: pendingPhoto });
   btn.disabled = false; btn.textContent = 'บันทึก';
 
   if(ok){
@@ -1151,11 +1215,10 @@ document.getElementById('log-submit').addEventListener('click', async ()=>{
     document.getElementById('log-name').value = '';
     document.getElementById('log-password').value = '';
     renderLogNameOptions();
+    logPhotoToken++; // ยกเลิกผลลัพธ์ compressImage ของรูปเก่าที่อาจยังค้างอยู่ ไม่ให้ไปติดรายการถัดไป
     pendingPhoto = null;
-    document.getElementById('photo-drop').innerHTML = `<span id="photo-drop-label">แตะเพื่ออัปโหลดรูป</span><input type="file" accept="image/*" id="log-photo">`;
+    resetLogPhotoInput();
     renderAll();
-  }else{
-    runs.pop();
   }
 });
 
@@ -1298,16 +1361,14 @@ function renderAdminTable(){
   });
   tbody.querySelectorAll('button.del').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
+      if(btn.disabled) return; // กันการกดซ้ำระหว่างที่คำขอลบก่อนหน้ายังไม่เสร็จ
       const tr = e.target.closest('tr');
       const id = tr.dataset.id;
       if(!confirm('ลบรายการนี้ใช่ไหม?')) return;
-      const idx = runs.findIndex(r=>r.id === id);
-      if(idx > -1){
-        const removed = runs.splice(idx,1)[0];
-        const ok = await savePersonRuns(removed.name);
-        if(ok){ showToast('ลบรายการแล้ว'); renderAll(); }
-        else runs.splice(idx,0,removed);
-      }
+      btn.disabled = true; btn.textContent = '...';
+      const ok = await deleteRunRow(id);
+      if(ok){ showToast('ลบรายการแล้ว'); renderAll(); }
+      else{ btn.disabled = false; btn.textContent = 'ลบ'; }
     });
   });
 }
@@ -1335,7 +1396,9 @@ function startEditRow(tr){
   const actions = tr.querySelector('.row-actions');
   actions.innerHTML = `<button class="save">บันทึก</button><button class="del">ยกเลิก</button>`;
 
-  actions.querySelector('.save').addEventListener('click', async ()=>{
+  const saveBtn = actions.querySelector('.save');
+  saveBtn.addEventListener('click', async ()=>{
+    if(saveBtn.disabled) return; // กันการกดซ้ำระหว่างที่ยังบันทึกไม่เสร็จ
     const nameVal = tr.querySelector('.cell-name input').value.trim();
     const distVal = parseFloat(tr.querySelector('.cell-distance input').value);
     const dateVal = tr.querySelector('.cell-date input').value;
@@ -1344,25 +1407,20 @@ function startEditRow(tr){
     }
     const backup = {...r};
     const oldName = r.name;
-    r.name = nameVal; r.distance = distVal; r.date = dateVal;
+    saveBtn.disabled = true; saveBtn.textContent = 'กำลังบันทึก...';
 
-    let ok;
-    if(nameVal !== oldName){
-      // carry the team assignment along with the renamed member
-      if(memberTeams[oldName] !== undefined && memberTeams[nameVal] === undefined){
-        memberTeams[nameVal] = memberTeams[oldName];
-        delete memberTeams[oldName];
-        await saveTeams();
-      }
-      const ok1 = await savePersonRuns(oldName);
-      const ok2 = await savePersonRuns(nameVal);
-      ok = ok1 && ok2;
-    }else{
-      ok = await savePersonRuns(nameVal);
+    // ถ้าเปลี่ยนชื่อ ให้ย้ายการตั้งค่าทีมไปกับชื่อใหม่ด้วย
+    if(nameVal !== oldName && memberTeams[oldName] !== undefined && memberTeams[nameVal] === undefined){
+      memberTeams[nameVal] = memberTeams[oldName];
+      delete memberTeams[oldName];
+      await saveTeams();
     }
 
+    // อัปเดตเฉพาะแถวนี้แถวเดียวด้วย id (แทนการลบทั้งหมด+insert ใหม่ทั้งหมด 2 รอบแบบเดิม)
+    const ok = await updateRunRow(r.id, { name: nameVal, distance: distVal, date: dateVal });
+
     if(ok){ showToast('อัปเดตรายการแล้ว'); renderAll(); }
-    else{ Object.assign(r, backup); renderAdminTable(); }
+    else{ Object.assign(r, backup); saveBtn.disabled = false; saveBtn.textContent = 'บันทึก'; renderAdminTable(); }
   });
   actions.querySelector('.del').addEventListener('click', ()=> renderAdminTable());
 }
